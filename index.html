@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Orden Correcto — Genesis OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b09;
+    --bg-2:#101210;
+    --panel:#14160f;
+    --panel-2:#191c12;
+    --ink:#f4f3e9;
+    --ink-dim:#a0a293;
+    --ink-faint:#67695a;
+    --signal:#d4ff3f;
+    --signal-deep:#a4d400;
+    --warn:#ff7a3d;
+    --line:#262920;
+    --line-2:#33372a;
+    --display:'Bricolage Grotesque',Impact,sans-serif;
+    --body:'Hanken Grotesk',system-ui,sans-serif;
+    --mono:'Space Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.62;
+    font-size:16px;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(ellipse 90% 40% at 50% -8%, rgba(212,255,63,.08), transparent 62%),
+      radial-gradient(circle at 100% 102%, rgba(255,122,61,.05), transparent 46%);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.4;
+    background-image:
+      linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
+    background-size:38px 38px;
+    mask-image:radial-gradient(ellipse 100% 80% at 50% 0%, #000, transparent 75%);
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px;position:relative;z-index:2}
+
+  /* ---------- HERO ---------- */
+  header{padding:64px 0 40px}
+  .kicker{
+    font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--signal);display:flex;align-items:center;gap:11px;margin-bottom:26px;
+    opacity:0;animation:rise .7s .05s forwards;
+  }
+  .kicker::before{content:"";width:30px;height:1px;background:var(--signal)}
+  .kicker .dot{width:6px;height:6px;border-radius:50%;background:var(--signal);box-shadow:0 0 12px var(--signal)}
+  h1{
+    font-family:var(--display);font-weight:800;line-height:.94;text-transform:uppercase;
+    font-size:clamp(48px,13vw,92px);letter-spacing:-.02em;
+  }
+  h1 .a{display:block;opacity:0;animation:rise .8s .12s forwards}
+  h1 .b{display:block;color:var(--signal);opacity:0;animation:rise .8s .22s forwards}
+  .sub{
+    margin-top:24px;max-width:560px;color:var(--ink-dim);font-size:17px;
+    opacity:0;animation:rise .8s .34s forwards;
+  }
+  .sub strong{color:var(--ink);font-weight:600}
+  .sub .em{color:var(--signal);font-weight:600}
+  .meta{
+    margin-top:30px;display:flex;flex-wrap:wrap;gap:8px;
+    opacity:0;animation:rise .8s .44s forwards;
+  }
+  .tag{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    border:1px solid var(--line-2);border-radius:100px;padding:6px 13px;color:var(--ink-faint);
+  }
+
+  /* ---------- REFRAME ---------- */
+  .reframe{padding:46px 0 8px;border-top:1px solid var(--line);margin-top:36px}
+  .reframe .lead{font-family:var(--display);font-weight:700;font-size:clamp(23px,5.4vw,33px);line-height:1.16;letter-spacing:-.01em}
+  .reframe .lead .hl{color:var(--signal)}
+  .reframe p{margin-top:20px;color:var(--ink-dim);max-width:610px}
+  .reframe p strong{color:var(--ink);font-weight:600}
+
+  .ratio{
+    margin-top:32px;display:flex;align-items:stretch;border:1px solid var(--line-2);border-radius:12px;overflow:hidden;
+  }
+  .ratio>div{padding:18px 20px}
+  .ratio .big{flex:9;background:var(--panel-2)}
+  .ratio .small{flex:1.4;background:var(--bg-2);border-left:1px solid var(--line-2);min-width:104px}
+  .ratio .pct{font-family:var(--display);font-weight:800;font-size:30px;line-height:1}
+  .ratio .big .pct{color:var(--signal)}
+  .ratio .small .pct{color:var(--ink-faint)}
+  .ratio .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-top:9px;line-height:1.4}
+
+  /* ---------- PIPELINE ---------- */
+  .pipe-head{padding:54px 0 6px;display:flex;align-items:baseline;gap:14px}
+  .pipe-head .n{font-family:var(--mono);font-size:12px;color:var(--signal);letter-spacing:.06em;white-space:nowrap}
+  .pipe-head h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(26px,6.4vw,42px);line-height:.96;letter-spacing:-.01em}
+  .pipe-intro{color:var(--ink-dim);max-width:600px;margin-bottom:6px}
+
+  .pipe{position:relative;margin-top:14px;padding-left:8px}
+  .pipe::before{
+    content:"";position:absolute;left:30px;top:24px;bottom:120px;width:2px;
+    background:linear-gradient(180deg,var(--signal-deep),var(--line-2) 80%, transparent);
+    opacity:.5;
+  }
+
+  .station{position:relative;padding:0 0 30px 70px;}
+  .station .node{
+    position:absolute;left:8px;top:2px;width:46px;height:46px;border-radius:13px;
+    background:var(--panel);border:1px solid var(--line-2);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-weight:800;font-size:20px;color:var(--ink-dim);z-index:2;
+  }
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:15px;
+    padding:24px 24px 22px;transition:border-color .35s ease;
+  }
+  .card:hover{border-color:var(--line-2)}
+  .station.in .node{
+    color:var(--signal);border-color:var(--signal-deep);
+    box-shadow:0 0 0 4px rgba(212,255,63,.07), 0 6px 22px rgba(212,255,63,.12);
+  }
+  .stat-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+  .card h3{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.01em;margin-top:7px;line-height:1.1}
+  .anti,.yes{font-family:var(--mono);font-size:11.5px;letter-spacing:.01em;line-height:1.45;margin-top:13px;display:flex;gap:9px;align-items:flex-start}
+  .anti{color:var(--warn)}
+  .yes{color:var(--signal);margin-top:7px}
+  .anti::before{content:"NO";font-weight:700;flex-shrink:0;opacity:.9}
+  .yes::before{content:"SÍ";font-weight:700;flex-shrink:0;opacity:.9}
+  .card p{margin-top:15px;color:var(--ink-dim);font-size:15px}
+  .card p strong{color:var(--ink);font-weight:600}
+  .card p .sig{color:var(--signal);font-weight:600}
+
+  /* sub-block */
+  .block{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+  .block .bh{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-deep);margin-bottom:13px;display:flex;align-items:center;gap:9px}
+  .block .bh::before{content:"";width:14px;height:1px;background:var(--signal-deep)}
+
+  /* fact rows */
+  .facts{display:grid;gap:0;border:1px solid var(--line-2);border-radius:11px;overflow:hidden}
+  .fact{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:12px 15px;border-top:1px solid var(--line)}
+  .fact:first-child{border-top:none}
+  .fact .fk{font-size:14px;color:var(--ink-dim);line-height:1.4}
+  .fact .fk b{color:var(--ink);font-weight:600}
+  .fact .fv{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--signal);white-space:nowrap;text-align:right}
+  .fact .fv.warn{color:var(--warn)}
+  .fact .fv.dim{color:var(--ink-faint)}
+
+  /* list */
+  .list{margin-top:4px;display:grid;gap:9px}
+  .li{display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start;font-size:14.5px;color:var(--ink-dim);line-height:1.5}
+  .li::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--signal-deep);margin-top:8px;flex-shrink:0}
+  .li b{color:var(--ink);font-weight:600}
+
+  /* numbered mini steps */
+  .steps{margin-top:4px;display:grid;gap:11px}
+  .stp{display:grid;grid-template-columns:26px 1fr;gap:12px;align-items:start}
+  .stp .sn{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--signal);border:1px solid var(--line-2);border-radius:7px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0}
+  .stp .st{font-size:14.5px;color:var(--ink-dim);line-height:1.5}
+  .stp .st b{color:var(--ink);font-weight:600}
+
+  .chips{margin-top:18px;display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;
+    background:var(--panel-2);border:1px solid var(--line-2);color:var(--ink-dim);
+    border-radius:7px;padding:6px 10px;
+  }
+  .chip b{color:var(--signal);font-weight:700}
+
+  .rule{
+    margin-top:18px;font-family:var(--mono);font-size:12.5px;color:var(--ink);
+    background:var(--bg);border:1px dashed var(--line-2);border-radius:10px;padding:14px 16px;line-height:1.55;
+  }
+  .rule b{color:var(--signal)}
+  .rule .w{color:var(--warn)}
+
+  /* ---------- TERMINAL ---------- */
+  .terminal .node{
+    background:var(--signal);color:#0a0b09;border-color:var(--signal);
+    box-shadow:0 0 0 5px rgba(212,255,63,.12), 0 8px 30px rgba(212,255,63,.3);
+  }
+  .terminal.in .node{color:#0a0b09}
+  .terminal .card{background:linear-gradient(180deg,var(--panel-2),var(--panel));border-color:var(--signal-deep)}
+  .terminal .badge{font-family:var(--mono);font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--signal-deep);display:inline-block;margin-bottom:4px}
+  .struct{margin-top:6px;display:grid;gap:10px}
+  .srow{display:grid;grid-template-columns:34px 1fr;gap:13px;align-items:start;border-top:1px solid var(--line);padding-top:14px}
+  .srow:first-child{border-top:none;padding-top:2px}
+  .srow .d{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--signal);border:1px solid var(--signal-deep);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .srow .rt{font-weight:700;font-size:15px;letter-spacing:-.01em}
+  .srow .rd{color:var(--ink-dim);font-size:14px;margin-top:3px;line-height:1.5}
+  .srow .rd code{font-family:var(--mono);font-size:12.5px;color:var(--signal);background:rgba(212,255,63,.09);padding:1px 6px;border-radius:5px}
+
+  .vono{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+  .vo,.no{border:1px solid var(--line-2);border-radius:11px;padding:14px}
+  .vo .h,.no .h{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;font-weight:700}
+  .vo .h{color:var(--signal)}.no .h{color:var(--warn)}
+  .vo .it,.no .it{font-size:13.5px;color:var(--ink-dim);line-height:1.45;padding:6px 0;border-top:1px solid var(--line)}
+  .vo .it:first-of-type,.no .it:first-of-type{border-top:none}
+  .vo .it b,.no .it b{color:var(--ink);font-weight:600}
+
+  /* ---------- CTA ---------- */
+  .cta{margin:30px 0 0;text-align:center;border-top:1px solid var(--line);padding-top:52px}
+  .cta .small{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint)}
+  .cta h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(28px,7vw,46px);line-height:1.0;margin-top:16px;letter-spacing:-.01em}
+  .cta h2 .hl{color:var(--signal)}
+  .cta p{color:var(--ink-dim);max-width:470px;margin:18px auto 0;font-size:15.5px}
+  .keyword{
+    display:inline-flex;align-items:center;gap:13px;margin-top:30px;
+    font-family:var(--display);font-weight:800;font-size:clamp(40px,11vw,64px);letter-spacing:.02em;
+    color:#0a0b09;background:var(--signal);padding:10px 40px;border-radius:16px;
+    text-transform:uppercase;box-shadow:0 12px 44px rgba(212,255,63,.26);
+  }
+  .keyword .arrow{font-size:.5em;transform:translateY(2px)}
+  .cta .fine{margin-top:16px;font-size:13.5px;color:var(--ink-faint)}
+  .cta .fine strong{color:var(--ink-dim)}
+  footer{padding:48px 0 64px;text-align:center;color:var(--ink-faint);font-family:var(--mono);font-size:11px;letter-spacing:.06em;line-height:1.7}
+  footer .brand{color:var(--signal-deep)}
+
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .obs{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+  .obs.in{opacity:1;transform:none}
+
+  @media(max-width:560px){
+    .wrap{padding:0 16px}
+    .station{padding-left:58px}
+    .pipe::before{left:25px;bottom:150px}
+    .station .node{left:2px;width:42px;height:42px;font-size:18px}
+    .card{padding:20px 16px 18px}
+    .ratio .small{min-width:88px}
+    .vono{grid-template-columns:1fr}
+    .fact{grid-template-columns:1fr;gap:5px}
+    .fact .fv{justify-self:start;text-align:left}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <header>
+    <div class="kicker"><span class="dot"></span>Genesis OS · Guía de operador</div>
+    <h1>
+      <span class="a">El orden</span>
+      <span class="b">correcto</span>
+    </h1>
+    <p class="sub">Por qué la estructura de campaña es <strong>lo MENOS apalancado que hay</strong> — y las <span class="em">4 decisiones que sí mueven la aguja</span> antes de que toques un solo botón de Meta. Con los frameworks completos y los números reales.</p>
+    <div class="meta">
+      <span class="tag">Lectura · 14 min</span>
+      <span class="tag">E-commerce AR</span>
+      <span class="tag">Sin vendehumo</span>
+    </div>
+  </header>
+
+  <!-- REFRAME -->
+  <section class="reframe obs">
+    <p class="lead">Cambiás de <span class="hl">CBO a ABO</span>, de ABO a <span class="hl">Advantage+</span>… y seguís sin escalar. El problema no es tu estructura.</p>
+    <p>Todo el mercado vive corriendo atrás de la "nueva estructura de testeo". Hoy todos tiran CBO con 9 ads. Mañana alguien dice que ABO está mejor y todos vuelven. Después aparece otro con Advantage+ y pivotean de nuevo. Y mientras tanto escuchan ese contenido y se pasan pensando qué aplicar, como si eso fuera lo que mueve la aguja.</p>
+    <p><strong>No lo es.</strong> Ninguna estructura te salva de un mal producto, malos anuncios, mal proveedor, mala oferta o una investigación floja. Por eso testeás de todo y seguís sin validar. La estructura es la ÚLTIMA decisión que tomás, no la primera. Buscar la estructura mágica es buscar una excusa para no hacer el trabajo que de verdad mueve la aguja.</p>
+
+    <div class="ratio">
+      <div class="big">
+        <div class="pct">90%</div>
+        <div class="lbl">La idea · producto · research · creativo · oferta</div>
+      </div>
+      <div class="small">
+        <div class="pct">10%</div>
+        <div class="lbl">La estructura</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <div class="pipe-head obs">
+    <span class="n">[ EL PIPELINE ]</span>
+    <h2>El orden que sí funciona</h2>
+  </div>
+  <p class="pipe-intro obs">Cinco decisiones, en este orden exacto. Cada una se apoya en la anterior. Si una está rota, la mejor estructura de Meta del mundo no te salva. Recién cuando las cuatro primeras están clavadas, la quinta se vuelve trivial.</p>
+
+  <div class="pipe">
+
+    <!-- ========== 1 ========== -->
+    <div class="station obs">
+      <div class="node">1</div>
+      <div class="card">
+        <div class="stat-label">Framework F.F.V.D · Checklist GO/NO-GO</div>
+        <h3>Filtrar y validar el producto</h3>
+        <div class="anti">Copiar un producto de la biblioteca de anuncios y tirar CBO con $30 rezando para que pegue en 24 hs.</div>
+        <div class="yes">Buscar un problema con plata real detrás, y recién después el producto que lo resuelve mejor que la competencia.</div>
+        <p>El producto es el vehículo; <strong>el problema es el motor</strong>. No elegís productos, elegís problemas: reales, frecuentes, con consecuencias, que la gente ya intenta resolver y donde podés tener alto valor percibido. La búsqueda nunca se detiene — tiene una dimensión intuitiva (lo que aparece al estar metido en el rubro) y una técnica (el proceso sistemático). Esta es la parte técnica.</p>
+
+        <div class="block">
+          <div class="bh">El proceso de búsqueda</div>
+          <div class="steps">
+            <div class="stp"><div class="sn">1</div><div class="st"><b>Mirá afuera primero.</b> En la Biblioteca de Anuncios de Meta, arrancá por mercados más avanzados que Argentina (Colombia, por ejemplo). Buscás por dolor, nicho o categoría y filtrás por anuncios corriendo desde una fecha reciente para descartar los muertos.</div></div>
+            <div class="stp"><div class="sn">2</div><div class="st"><b>Validá al anunciante.</b> Una marca con <span style="color:var(--signal)">120 anuncios activos</span> hace meses está recontravalidada: el producto funciona y escala. La continuidad temporal te confirma que la unidad económica cierra.</div></div>
+            <div class="stp"><div class="sn">3</div><div class="st"><b>Cruzá con el mercado local.</b> Tres escenarios: <b>no está en Argentina</b> (océano azul, entrás primero), <b>ya está y vende</b> (validado doble, diferenciás en ángulo o marca), <b>alguien lo testeó y murió</b> (alerta: ¿ángulo equivocado, marca floja, mercado inmaduro?).</div></div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="bh">Checklist GO/NO-GO · 7 de 7 musts</div>
+          <p style="margin-top:0">El candidato pasa por tres bloques. Los musts son eliminatorios: si falla uno, no va.</p>
+          <div class="list" style="margin-top:14px">
+            <div class="li"><span><b>Bloque 1 · Market Fit.</b> Marcas afuera invirtiendo fuerte hace meses, gente pagando buen ticket, el mismo dolor existe en Argentina, el precio es lógico para el mercado local, y el problema es evergreen.</span></div>
+            <div class="li"><span><b>Bloque 2 · Operaciones.</b> Producto chico o mediano, no pesado ni frágil, post-venta simple, proveedor que abastece volumen, tiempos claros, calidad constante. Ideal 1-3 SKUs.</span></div>
+            <div class="li"><span><b>Bloque 3 · Ecosistema de marca.</b> Mecanismo único claro, transformación visible o sentida, recompra (directa o indirecta), packs que suben AOV, naming extensible.</span></div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="bh">Regla rápida de margen</div>
+          <p style="margin-top:0">Según el costo del producto, este es el múltiplo mínimo al que tenés que venderlo:</p>
+          <div class="facts" style="margin-top:13px">
+            <div class="fact"><div class="fk">Costo <b>$2.000 – $5.000</b></div><div class="fv">vender ×10</div></div>
+            <div class="fact"><div class="fk">Costo <b>$5.000 – $10.000</b></div><div class="fv">vender ×7</div></div>
+            <div class="fact"><div class="fk">Costo <b>$10.000 – $20.000</b></div><div class="fv">vender ×5</div></div>
+            <div class="fact"><div class="fk">Costo <b>$20.000 – $35.000</b></div><div class="fv">vender ×4</div></div>
+            <div class="fact"><div class="fk">Costo <b>$35.000 – $50.000</b></div><div class="fv">vender ×3</div></div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="bh">Banderas: cuáles ignorar y cuáles tomar en serio</div>
+          <div class="vono">
+            <div class="vo">
+              <div class="h">Se resuelven fácil</div>
+              <div class="it"><b>Proveedor:</b> siempre se consigue. Es operativo.</div>
+              <div class="it"><b>Diferenciador / ángulo:</b> es trabajo de marketing.</div>
+              <div class="it"><b>ANMAT:</b> no llaman por claims en publicidad (sí están prohibidos en el packaging).</div>
+            </div>
+            <div class="no">
+              <div class="h">Frenan de verdad</div>
+              <div class="it"><b>Mercado saturado</b> con marcas posicionadas fuertes.</div>
+              <div class="it"><b>Regulación</b> que mata la propuesta de valor.</div>
+              <div class="it"><b>Dolor difuso</b> + transformación lenta = triggers débiles.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rule">El flujo entero: bajás 5-20 productos a un doc con links → filtrado general (semáforo <b>verde / amarillo / rojo</b>) → validación profunda uno por uno → <b>elegís UN solo producto</b> y avanzás. La meta nunca es encontrar productos —de eso aparecen miles—, es <span class="w">decidir rápido</span> sobre cuál vale la pena invertir energía.</div>
+
+        <div class="chips">
+          <span class="chip">Market Fit</span><span class="chip">Operaciones</span><span class="chip">Ecosistema</span><span class="chip"><b>7/7 musts</b></span><span class="chip"><b>GO / NO-GO</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 2 ========== -->
+    <div class="station obs">
+      <div class="node">2</div>
+      <div class="card">
+        <div class="stat-label">Documento B · La fundación del negocio</div>
+        <h3>La investigación de mercado: tu munición</h3>
+        <div class="anti">Escribir el copy "a ojo", desde lo que vos creés que le duele al cliente.</div>
+        <div class="yes">Construir cada palabra sobre frases textuales del cliente real (la VOCC).</div>
+        <p>Es el documento <strong>más importante</strong> de todo el negocio, y define cómo vas a comunicar absolutamente todo: anuncios, landings, copies, flujos de email, identidad de marca, posicionamiento, pricing y ofertas. <span class="sig">Sin Doc B, todo sale genérico</span> — el CPA se dispara y el negocio va a pérdida. Todo lo que viene después se construye sobre esta base.</p>
+
+        <div class="block">
+          <div class="bh">VOCC — la voz del cliente</div>
+          <p style="margin-top:0">Son las frases <strong>literales</strong> del cliente: lo que escribe en reseñas, comentarios, foros y testimonios. Ya escribió lo que le duele y lo que desea; solo hay que recolectarlo y usarlo. Se scrapean <span class="sig">100+ frases</span> en paralelo desde Mercado Libre, Amazon, marcas del exterior, Reddit, TikTok y foros, y se clusterizan por dolor y por avatar. Regla de oro: <strong>no se inventa copy</strong>, se usan las palabras del cliente.</p>
+        </div>
+
+        <div class="block">
+          <div class="bh">La cadena de consecuencias (el activo más potente)</div>
+          <p style="margin-top:0">Acá está el oro para el marketing. Se mapea el costo real del problema en capas, y eso es lo que activa el trigger emocional que hace accionar:</p>
+          <div class="steps" style="margin-top:14px">
+            <div class="stp"><div class="sn">1</div><div class="st"><b>Problema</b> — el dolor concreto.</div></div>
+            <div class="stp"><div class="sn">2</div><div class="st"><b>Consecuencia diaria</b> — qué tiene que hacer todos los días por culpa de eso.</div></div>
+            <div class="stp"><div class="sn">3</div><div class="st"><b>Costo emocional</b> — vergüenza, ansiedad, autoconciencia.</div></div>
+            <div class="stp"><div class="sn">4</div><div class="st"><b>Costo social</b> — planes que cancela, situaciones que evita.</div></div>
+            <div class="stp"><div class="sn">5</div><div class="st"><b>Costo futuro</b> — en qué se convierte si no lo resuelve.</div></div>
+          </div>
+          <div class="rule">El proceso mental del cliente es comparativo: <b>"¿qué vale más, $50.000 o seguir sufriendo esto?"</b>. Cuando el dolor está bien expuesto, decide accionar casi sin importar el precio. Por eso una marca que conecta con el dolor profundo <b>puede cobrar más</b>.</div>
+        </div>
+
+        <div class="block">
+          <div class="bh">Lo que el Doc B te entrega</div>
+          <div class="list">
+            <div class="li"><span><b>Buyer personas (mín. 3)</b> con nombre propio. No es demografía ("mujeres 25-45"): es un perfil con contexto, trigger del momento de búsqueda, qué ya probó, miedos, objeciones y las frases exactas que usa.</span></div>
+            <div class="li"><span><b>Mapeo de objeciones:</b> qué alternativa probó antes, por qué falló, dónde lo defraudaron, y cómo se destruye esa objeción en el copy. Anticipás todas las dudas antes de que el cliente las escriba.</span></div>
+            <div class="li"><span><b>4-6 ángulos de venta desarrollados:</b> cada uno con su dolor, su promesa, sus conceptos para creativos, su titular de landing y su buyer persona principal.</span></div>
+            <div class="li"><span><b>Competencia y gaps:</b> precio, promesa, mecanismo, oferta, proof y debilidad de cada competidor — y el espacio que nadie está cubriendo.</span></div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="bh">Qué es realmente un "ángulo"</div>
+          <p style="margin-top:0">Una forma distinta de vender el <strong>mismo producto</strong>, basada en un segmento diferente, con un dolor diferente, que compra por una razón diferente. <span class="sig">Test:</span> si dos "ángulos" le hablan a la misma persona por el mismo dolor, no son dos ángulos — son dos variaciones de copy del mismo ángulo. Y los ángulos se distribuyen por nivel de conciencia (Schwartz): aprox. <b>15%</b> del presupuesto a no conscientes, <b>45%</b> a conscientes del problema y de la solución, <b>40%</b> a conscientes del producto y muy conscientes.</p>
+        </div>
+
+        <div class="chips">
+          <span class="chip">100+ frases VOCC</span><span class="chip">Cadena de consecuencias</span><span class="chip">Buyer personas</span><span class="chip">Objeciones</span><span class="chip"><b>4-6 ángulos</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 3 ========== -->
+    <div class="station obs">
+      <div class="node">3</div>
+      <div class="card">
+        <div class="stat-label">Creativos · La fábrica que no se apaga</div>
+        <h3>La creación de ads</h3>
+        <div class="anti">Tirar 50 anuncios por tirar, o escalar 2-3 ganadores e iterar siempre sobre lo mismo.</div>
+        <div class="yes">Muchos creativos de calidad, con diversidad real de conceptos y reemplazos listos.</div>
+        <p>Hoy <strong>el creativo ES el targeting</strong>: Meta confirmó que el 56% de la segmentación se hace por el creativo, no por la configuración. Por eso esta es la palanca de eficiencia más grande de la cuenta. Y todo arranca en el hook.</p>
+
+        <div class="block">
+          <div class="bh">El hook decide el 80%</div>
+          <p style="margin-top:0">El <span class="sig">80% de la audiencia no pasa del hook</span> (los primeros 2-4 segundos), así que el hook define el 80% de la performance. Pero su trabajo NO es frenar a todo el mundo: es atraer a la audiencia <strong>correcta</strong>. Un hook que frena a todos pero atrae al público equivocado destruye la cuenta, porque Meta optimiza hacia quien interactúa.</p>
+          <div class="list" style="margin-top:14px">
+            <div class="li"><span><b>3 elementos, evaluados por separado:</b> visual (lo que se ve), audio (lo que se dice) y copy (texto en pantalla). Cambiar uno solo puede duplicar el hook rate.</span></div>
+            <div class="li"><span><b>Criterios, en orden:</b> claridad → relevancia → novedad → especificidad → credibilidad.</span></div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="bh">La curva de conciencia (hook → CTA)</div>
+          <p style="margin-top:0">No se pasa del hook a vender de golpe. La sensación de "me están vendiendo" tiene que subir como una curva suave:</p>
+          <div class="facts" style="margin-top:13px">
+            <div class="fact"><div class="fk"><b>Hook</b> · romper el scroll, conciencia cero</div><div class="fv">0–3 s</div></div>
+            <div class="fact"><div class="fk"><b>Puente</b> · educar, bajar la guardia</div><div class="fv">3–10 s</div></div>
+            <div class="fact"><div class="fk"><b>Cuerpo</b> · mecanismo + mención casual</div><div class="fv">10–25 s</div></div>
+            <div class="fact"><div class="fk"><b>CTA</b> · conclusión natural</div><div class="fv">25–30 s</div></div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="bh">Diversidad &gt; cantidad</div>
+          <p style="margin-top:0">Desde 2025, la <strong>diversidad de conceptos es el factor #1</strong> en la performance de una cuenta. Meta penaliza creativos similares: <span class="sig">9 conceptos diferentes valen más que 9 variaciones</span> del mismo. La regla operativa es <b>80% conceptos nuevos + 20% iteraciones</b> cambiando una sola variable a la vez — la mayoría la aplica al revés y por eso la cuenta muere en cámara lenta.</p>
+          <div class="rule">Cada ángulo del Doc B tiene su propio set de hooks y <span class="w">no se recicla entre ángulos</span>. Multiplicás: 3 ángulos × 3 tipos de hook × 3 visuales = <b>27 hooks distintos</b>.</div>
+        </div>
+
+        <div class="block">
+          <div class="bh">Imágenes estáticas: el formato subestimado</div>
+          <p style="margin-top:0">Son más baratas de producir, tienen CPM más bajo, y son mucho más fáciles para testear ángulos. Con una sola frase que resuelve un dolor ya estás testeando ese ángulo <strong>en minutos</strong>. Con un video, si el hook es malo, todo el video es malo. Los formatos se combinan: B-Roll, UGC humano, UGC con IA, estáticos, demo, before/after, comparativa, unboxing.</p>
+        </div>
+
+        <div class="chips">
+          <span class="chip">Hook = 80%</span><span class="chip">Visual · Audio · Copy</span><span class="chip"><b>80% nuevo / 20% iteración</b></span><span class="chip">Estáticos p/ testear</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 4 ========== -->
+    <div class="station obs">
+      <div class="node">4</div>
+      <div class="card">
+        <div class="stat-label">Oferta · Números reales · CPA break-even</div>
+        <h3>La oferta y los números que no mienten</h3>
+        <div class="anti">Mirar el ROAS de Meta y creer que estás ganando plata.</div>
+        <div class="yes">Conocer el máximo exacto que podés pagar por venta — y armar la oferta para subirlo.</div>
+        <p>El ROAS te miente: lo inflan los view-throughs, el retargeting y la sobre-atribución, y no descuenta tus costos. La métrica que importa para tomar decisiones de negocio es el <strong>CPA break-even</strong> y, en escala, el <strong>MER</strong> (revenue total real ÷ ad spend total).</p>
+
+        <div class="block">
+          <div class="bh">Desglose real de una venta de $70.000</div>
+          <p style="margin-top:0">Acá entra el dinero de verdad. Estos son los costos que el ROAS no ve:</p>
+          <div class="facts" style="margin-top:13px">
+            <div class="fact"><div class="fk">Revenue bruto</div><div class="fv">$70.000</div></div>
+            <div class="fact"><div class="fk">Producto al proveedor</div><div class="fv warn">– $10.000</div></div>
+            <div class="fact"><div class="fk">Logística + envío a todo el país</div><div class="fv warn">– $7.500</div></div>
+            <div class="fact"><div class="fk">Pasarela + cuotas sin interés</div><div class="fv warn">– $11.750</div></div>
+            <div class="fact"><div class="fk">Ingresos Brutos (impuesto)</div><div class="fv warn">– $2.800</div></div>
+            <div class="fact"><div class="fk">Ads para adquirir la venta</div><div class="fv warn">– $20.000</div></div>
+            <div class="fact"><div class="fk"><b>Profit por compra</b></div><div class="fv">$17.950 · ~25%</div></div>
+          </div>
+          <div class="rule">Las comisiones reales en Argentina pesan: cobro al instante <b>5,89%</b> + IVA, 2 cuotas <b>6,06%</b>, 3 cuotas <b>7,98%</b> → promedio real ~<b>14%</b>. Sumá Ingresos Brutos (4,5%) y son <b>~18,5% de descuento</b> por venta antes de tocar el producto.</div>
+        </div>
+
+        <div class="block">
+          <div class="bh">La palanca no es bajar el CPA. Es subir el AOV</div>
+          <p style="margin-top:0">Obsesionarse con un CPA bajo es pelear la batalla chica. La palanca real es el <strong>AOV</strong> (ticket promedio): el mismo producto vendido en bundle de 2 o 3 reparte los costos fijos entre más unidades y <span class="sig">cambia la pendiente del negocio entero</span> sin tocar la pauta. Se sube con bundles, order bumps, upsells (envío prioritario, garantía) y cross-sells.</p>
+          <div class="list" style="margin-top:14px">
+            <div class="li"><span><b>Front-end:</b> el producto héroe es la puerta de entrada. El objetivo sano es no perder en la primera compra (breakeven o levemente rentable).</span></div>
+            <div class="li"><span><b>Back-end:</b> ahí recuperás y multiplicás — recompras, upsells, cross-sells, email. Dejás de mirar CPA y empezás a mirar <b>AOV + LTV</b>.</span></div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="bh">Dónde se hace la plata: la recompra</div>
+          <p style="margin-top:0">La primera compra deja ~$17.950 después de pagar $20.000 de ads. Pero en la <strong>segunda compra ya no pagás publicidad</strong> para adquirir a ese cliente:</p>
+          <div class="facts" style="margin-top:13px">
+            <div class="fact"><div class="fk"><b>1ª compra</b> · profit limpio</div><div class="fv">$17.950</div></div>
+            <div class="fact"><div class="fk"><b>2ª compra</b> · profit + ads ahorrados</div><div class="fv">$37.950</div></div>
+          </div>
+          <div class="rule">Cada recompra deja <b>más del doble</b> que la primera venta. La plata real está en la 2ª, 3ª y 4ª compra — el backing system (recompra + email + comunidad + referidos). Pero ojo: <span class="w">la primera compra igual tiene que ser rentable</span>, no se va a pérdida esperando recuperar después.</div>
+        </div>
+
+        <div class="block">
+          <div class="bh">Cash flow: el lever #1</div>
+          <p style="margin-top:0">La plata es el oxígeno de la marca. Las marcas no mueren por malos productos, mueren por quedarse sin liquidez. El ciclo de conversión de cash es de <span class="sig">60-90 días</span>. La regla: vivir de tu trabajo fijo y dejar toda la plata de la marca reinvertida. El que saca plata antes de tiempo, mata la marca.</p>
+        </div>
+
+        <div class="chips">
+          <span class="chip"><b>CPA Break-Even</b></span><span class="chip">AOV ↑ con bundles</span><span class="chip">MER &gt; ROAS</span><span class="chip">LTV / backing system</span><span class="chip">Cash flow</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 5 — TERMINAL ========== -->
+    <div class="station terminal obs">
+      <div class="node">5</div>
+      <div class="card">
+        <div class="badge">Recién ahora</div>
+        <div class="stat-label">La estructura · La que corro en mis 3 marcas</div>
+        <h3>La estructura de campañas</h3>
+        <p>Cuando los 4 puntos de arriba están clavados, esto es lo simple que se vuelve. Tal cual la corro en mis marcas, sin vueltas, en 2026. <strong>La estructura no es la magia; es el contenedor de todo lo anterior.</strong></p>
+
+        <div class="block" style="border-top-color:var(--line-2)">
+          <div class="bh">El esqueleto</div>
+          <div class="struct">
+            <div class="srow">
+              <div class="d">A</div>
+              <div>
+                <div class="rt">1 campaña de prospección · SOLO videos</div>
+                <div class="rd">Ad sets divididos por buyer persona o por ángulo (los del Doc B). Atribución <code>7-day click</code>. Su trabajo es meter gente nueva al ecosistema.</div>
+              </div>
+            </div>
+            <div class="srow">
+              <div class="d">B</div>
+              <div>
+                <div class="rt">1 campaña de retargeting · SOLO imágenes</div>
+                <div class="rd">Oferta, cuotas, garantía, envío. Un solo ad set. <code>Excluir clientes existentes</code>.</div>
+              </div>
+            </div>
+            <div class="srow">
+              <div class="d">C</div>
+              <div>
+                <div class="rt">Siempre broad</div>
+                <div class="rd">En el <code>99,9%</code> de los casos, cero intereses y cero audiencias custom. Apenas ponés intereses limitás el pool y te sube el CPM. Hoy el targeting lo hace el creativo.</div>
+              </div>
+            </div>
+            <div class="srow">
+              <div class="d">D</div>
+              <div>
+                <div class="rt">El embudo va en los CREATIVOS, no en la cuenta</div>
+                <div class="rd">El TOFU/MOFU/BOFU como estructura de cuenta murió. Distribución de creativos: <code>60% TOF</code> · <code>25% MOF</code> · <code>15% BOF</code>.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="block" style="border-top-color:var(--line-2)">
+          <div class="bh">Por qué separar videos de imágenes</div>
+          <p style="margin-top:0">Las imágenes tienen CPM más bajo, así que si las mezclás con videos <strong>se comen todo el presupuesto</strong> y no prospectás: la frecuencia se dispara, escalás presupuesto pero la facturación no sube. Por eso van en campañas separadas, siempre.</p>
+        </div>
+
+        <div class="block" style="border-top-color:var(--line-2)">
+          <div class="bh">Campañas: lo que va y lo que no</div>
+          <div class="vono">
+            <div class="vo">
+              <div class="h">Va</div>
+              <div class="it"><b>CBO Broad</b> — Meta distribuye y testea solo.</div>
+              <div class="it"><b>ABO Bid Caps</b> — escalar ganadores en fechas.</div>
+              <div class="it"><b>Zombie Cost Cap</b> — revivir creativos saturados.</div>
+              <div class="it"><b>Advantage+ incremental</b> — para escalar (+24% conv.).</div>
+            </div>
+            <div class="no">
+              <div class="h">No va</div>
+              <div class="it"><b>Con intereses</b> — limitan el pool, suben CPM.</div>
+              <div class="it"><b>De tráfico</b> — te traen clickers, no compradores.</div>
+              <div class="it"><b>Retargeting segmentado</b> — +50-60% de CPM.</div>
+              <div class="it"><b>Pockets</b> — duplicar ad sets ya no funciona.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="block" style="border-top-color:var(--line-2)">
+          <div class="bh">Las métricas reales vs las que mienten</div>
+          <div class="facts">
+            <div class="fact"><div class="fk"><b>Confiables</b> · decisiones diarias</div><div class="fv dim">CTR · CPC · hook rate</div></div>
+            <div class="fact"><div class="fk"><b>Mienten</b> · dependen del pixel</div><div class="fv warn">ROAS · CPA</div></div>
+            <div class="fact"><div class="fk"><b>Reales</b> · decisiones de negocio</div><div class="fv">MER · Blended CAC</div></div>
+          </div>
+          <div class="rule">Atribución: <b>7-day click</b> siempre. <b>1-day view = NUNCA</b> (se atribuye ventas que iban a pasar igual). Para escalar, surf scaling cada <b>2-4 hs</b> contra el CPA break-even y reset de budgets a medianoche.</div>
+        </div>
+
+        <div class="rule" style="background:var(--bg-2)">Si tenés los 4 puntos previos resueltos, <b>cualquier estructura te sirve</b>. Si no los tenés, <span class="w">ninguna te salva</span>. Por eso lo más apalancado nunca fue la estructura.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA -->
+  <section class="cta obs">
+    <div class="small">¿Te quedaste con ganas de más?</div>
+    <h2>Tu cuenta no tiene un problema de <span class="hl">estructura</span>.<br>Tiene un problema de <span class="hl">orden</span>.</h2>
+    <p>Si querés que veamos juntos en cuál de estos 5 puntos está tu cuello de botella real, escribime. Sin guion de venta, sin compromiso.</p>
+    <div class="keyword">YO <span class="arrow">↩</span></div>
+    <p class="fine">Respondé <strong>YO</strong> a la historia y arrancamos la conversación.</p>
+  </section>
+
+  <footer>
+    GENESIS OS — <span class="brand">Manu Domínguez</span><br>Del testeo aleatorio al sistema predecible.
+  </footer>
+
+</div>
+
+<script>
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target);} });
+  },{threshold:.14});
+  document.querySelectorAll('.obs').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
