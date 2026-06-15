@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genesis OS · Pre-Call</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#08090B;
+    --bg-2:#0E1014;
+    --bg-3:#15181E;
+    --line:rgba(255,255,255,0.08);
+    --line-2:rgba(255,255,255,0.14);
+    --text:#F3F5F8;
+    --text-2:#AEB6C2;
+    --muted:#727A87;
+    --accent:#34E0A1;
+    --accent-2:#1FB67E;
+    --accent-soft:rgba(52,224,161,0.12);
+    --accent-glow:rgba(52,224,161,0.35);
+    --radius:16px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  /* ambient texture */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(52,224,161,0.06), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(52,224,161,0.04), transparent 55%);
+    pointer-events:none;z-index:0;
+  }
+
+  .deck{position:relative;z-index:1;scroll-snap-type:y mandatory;height:100vh;overflow-y:scroll;scrollbar-width:none}
+  .deck::-webkit-scrollbar{display:none}
+
+  .slide{
+    min-height:100vh;
+    scroll-snap-align:start;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:clamp(2.2rem,5vw,5.5rem);
+    position:relative;
+    border-bottom:1px solid var(--line);
+  }
+  .wrap{width:100%;max-width:960px;margin:0 auto}
+
+  /* type system */
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:clamp(.62rem,1.1vw,.78rem);
+    letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent);font-weight:500;
+    display:inline-flex;align-items:center;gap:.6em;margin-bottom:clamp(1rem,2.4vw,1.8rem);
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--accent);opacity:.7}
+
+  h1{
+    font-size:clamp(2rem,5.4vw,4.1rem);
+    line-height:1.02;letter-spacing:-.03em;font-weight:800;
+    margin-bottom:clamp(1.1rem,2.6vw,2rem);
+  }
+  h1 .dim{color:var(--muted)}
+  h1 .hl{color:var(--accent)}
+
+  .lead{
+    font-size:clamp(1rem,1.9vw,1.35rem);
+    color:var(--text-2);line-height:1.5;max-width:42ch;font-weight:400;
+  }
+  .lead.tight{max-width:38ch}
+
+  /* bullets */
+  .bullets{list-style:none;display:flex;flex-direction:column;gap:clamp(.7rem,1.5vw,1.05rem);margin-top:clamp(1.2rem,2.6vw,2rem)}
+  .bullets li{
+    display:flex;gap:.95rem;align-items:flex-start;
+    font-size:clamp(.98rem,1.7vw,1.22rem);line-height:1.4;color:var(--text);font-weight:500;
+  }
+  .bullets li::before{
+    content:"";flex:0 0 auto;width:9px;height:9px;margin-top:.5em;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 12px var(--accent-glow);
+  }
+  .bullets li b{color:var(--accent);font-weight:700}
+
+  /* quote / feature phrase */
+  .feature{
+    margin-top:clamp(1.6rem,3vw,2.4rem);
+    border-left:3px solid var(--accent);
+    padding:clamp(.9rem,2vw,1.3rem) 0 clamp(.9rem,2vw,1.3rem) clamp(1.1rem,2.5vw,1.7rem);
+    font-size:clamp(1.15rem,2.6vw,1.9rem);font-weight:700;line-height:1.22;letter-spacing:-.02em;
+    color:var(--text);
+  }
+  .feature em{font-style:normal;color:var(--accent)}
+
+  /* metrics row */
+  .metrics{display:flex;flex-wrap:wrap;gap:clamp(.7rem,1.6vw,1.1rem);margin-top:clamp(1.4rem,3vw,2.2rem)}
+  .metric{
+    flex:1 1 150px;background:var(--bg-2);border:1px solid var(--line);
+    border-radius:var(--radius);padding:clamp(1rem,2.2vw,1.4rem);
+  }
+  .metric .n{font-size:clamp(1.5rem,3.4vw,2.4rem);font-weight:800;letter-spacing:-.03em;line-height:1}
+  .metric .n .u{color:var(--accent)}
+  .metric .l{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-top:.6rem;line-height:1.3}
+
+  /* card grid */
+  .grid{display:grid;gap:clamp(.7rem,1.6vw,1.1rem);margin-top:clamp(1.4rem,3vw,2.2rem)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .card{
+    background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:clamp(1.05rem,2.3vw,1.55rem);position:relative;overflow:hidden;
+  }
+  .card .tag{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:.7rem;display:block}
+  .card h3{font-size:clamp(1.02rem,2vw,1.3rem);font-weight:700;letter-spacing:-.02em;margin-bottom:.45rem}
+  .card p{font-size:clamp(.85rem,1.5vw,1rem);color:var(--text-2);line-height:1.42}
+  .card .big{font-size:clamp(1.7rem,3.6vw,2.6rem);font-weight:800;letter-spacing:-.03em;color:var(--accent);line-height:1;margin-bottom:.35rem}
+
+  /* pillar flow */
+  .flow{display:flex;align-items:stretch;gap:0;margin-top:clamp(1.6rem,3.4vw,2.6rem);flex-wrap:wrap}
+  .step{
+    flex:1 1 200px;background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:clamp(1.1rem,2.4vw,1.7rem);position:relative;
+  }
+  .step .num{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent);font-weight:600;letter-spacing:.1em}
+  .step h3{font-size:clamp(1.25rem,2.8vw,1.8rem);font-weight:800;letter-spacing:-.02em;margin:.55rem 0 .5rem}
+  .step p{font-size:clamp(.85rem,1.5vw,1rem);color:var(--text-2);line-height:1.4}
+  .arrow{display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:1.6rem;padding:0 clamp(.4rem,1.2vw,1rem);font-weight:300}
+  @media(max-width:720px){.arrow{transform:rotate(90deg);padding:.5rem 0}.flow{flex-direction:column}}
+
+  /* equation */
+  .eq{display:flex;align-items:center;gap:clamp(.5rem,1.5vw,1rem);flex-wrap:wrap;margin-top:clamp(1.6rem,3.4vw,2.6rem)}
+  .eq .term{
+    background:var(--bg-2);border:1px solid var(--line-2);border-radius:12px;
+    padding:clamp(.7rem,1.6vw,1rem) clamp(.9rem,2vw,1.3rem);font-weight:700;
+    font-size:clamp(.92rem,1.7vw,1.18rem);text-align:center;line-height:1.2;
+  }
+  .eq .op{color:var(--accent);font-size:clamp(1.2rem,2.6vw,1.8rem);font-weight:600}
+  .eq .res{background:var(--accent-soft);border:1px solid var(--accent);color:var(--accent)}
+
+  /* two-state mini cards (apertura) */
+  .states{display:grid;grid-template-columns:1fr 1fr;gap:clamp(.7rem,1.6vw,1.1rem);margin-top:clamp(1.4rem,3vw,2.1rem)}
+  @media(max-width:640px){.states{grid-template-columns:1fr}.g2,.g3{grid-template-columns:1fr}}
+  .state{border:1px solid var(--line);border-radius:var(--radius);padding:clamp(1rem,2.2vw,1.5rem);background:var(--bg-2)}
+  .state.bad{opacity:.62}
+  .state .who{font-weight:700;font-size:clamp(1rem,1.9vw,1.25rem);margin-bottom:.5rem;line-height:1.25}
+  .state .res{font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .state.good .res{color:var(--accent)}
+
+  .closing{margin-top:clamp(1.6rem,3vw,2.4rem);font-size:clamp(1.1rem,2.2vw,1.6rem);font-weight:600;letter-spacing:-.02em}
+  .closing .hl{color:var(--accent)}
+
+  /* navigation furniture */
+  .counter{
+    position:fixed;top:clamp(1.4rem,3vw,2.2rem);left:clamp(1.6rem,4vw,3rem);z-index:20;
+    font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.12em;color:var(--muted);
+  }
+  .counter b{color:var(--text);font-weight:600}
+  .brand{
+    position:fixed;top:clamp(1.4rem,3vw,2.2rem);right:clamp(1.6rem,4vw,3rem);z-index:20;
+    font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;
+    display:flex;align-items:center;gap:.5em;
+  }
+  .brand .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent-glow)}
+
+  .dots{position:fixed;right:clamp(1rem,2.2vw,1.8rem);top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:.7rem}
+  .dots button{
+    width:9px;height:9px;border-radius:50%;border:1px solid var(--line-2);background:transparent;cursor:pointer;padding:0;transition:.25s;
+  }
+  .dots button.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 10px var(--accent-glow);transform:scale(1.15)}
+  .dots button:hover{border-color:var(--accent)}
+  @media(max-width:720px){.dots{display:none}}
+
+  .hint{
+    position:fixed;bottom:clamp(1.2rem,2.6vw,2rem);left:50%;transform:translateX(-50%);z-index:20;
+    font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;
+    display:flex;align-items:center;gap:.7em;opacity:.7;transition:opacity .4s;
+  }
+  .hint .k{border:1px solid var(--line-2);border-radius:5px;padding:.15em .5em;color:var(--text-2)}
+
+  /* entrance animation */
+  .slide .wrap > *{opacity:0;transform:translateY(22px);transition:opacity .6s cubic-bezier(.2,.7,.2,1),transform .6s cubic-bezier(.2,.7,.2,1)}
+  .slide.in .wrap > *{opacity:1;transform:none}
+  .slide.in .wrap > *:nth-child(1){transition-delay:.05s}
+  .slide.in .wrap > *:nth-child(2){transition-delay:.13s}
+  .slide.in .wrap > *:nth-child(3){transition-delay:.21s}
+  .slide.in .wrap > *:nth-child(4){transition-delay:.29s}
+  .slide.in .wrap > *:nth-child(5){transition-delay:.37s}
+
+  @media(prefers-reduced-motion:reduce){
+    .slide .wrap > *{opacity:1;transform:none;transition:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<div class="counter"><b id="cur">01</b> / <span id="tot">10</span></div>
+<div class="brand"><span class="dot"></span>Genesis OS</div>
+<nav class="dots" id="dots"></nav>
+<div class="hint"><span class="k">↑</span><span class="k">↓</span> navegar</div>
+
+<main class="deck" id="deck">
+
+  <!-- 01 · APERTURA -->
+  <section class="slide" data-label="Apertura">
+    <div class="wrap">
+      <span class="eyebrow">Pre-Call · Sesión confirmada</span>
+      <h1>Antes de tu sesión,<br><span class="hl">mirá esto hasta el final.</span></h1>
+      <p class="lead">A esta reunión llegan dos tipos de personas. La diferencia no es el negocio: es con cuánta claridad se conectan.</p>
+      <div class="states">
+        <div class="state bad">
+          <div class="who">El que se conecta “a ver qué onda”</div>
+          <div class="res">→ Se va igual de perdido</div>
+        </div>
+        <div class="state good">
+          <div class="who">El que llega sabiendo qué va a resolver</div>
+          <div class="res">→ Se va con un plan claro</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 · AUTORIDAD -->
+  <section class="slide" data-label="Quién soy">
+    <div class="wrap">
+      <span class="eyebrow">Quién te va a acompañar</span>
+      <h1>Manuel Domínguez<br><span class="dim">Fundador de Genesis OS</span></h1>
+      <div class="metrics">
+        <div class="metric"><div class="n">+2 <span class="u">años</span></div><div class="l">En e-commerce</div></div>
+        <div class="metric"><div class="n">3 <span class="u">marcas</span></div><div class="l">Operando hoy</div></div>
+        <div class="metric"><div class="n">+300M<span class="u">/mes</span></div><div class="l">Facturación combinada</div></div>
+        <div class="metric"><div class="n">50–150M</div><div class="l">Donde escalan mis alumnos</div></div>
+      </div>
+      <p class="lead" style="margin-top:1.6rem">Lo que te cuento no es teoría: es lo que aplico todos los días en mis marcas y en las de mis alumnos.</p>
+    </div>
+  </section>
+
+  <!-- 03 · EL PROBLEMA -->
+  <section class="slide" data-label="El problema">
+    <div class="wrap">
+      <span class="eyebrow">El problema real</span>
+      <h1>No te falta esfuerzo.<br><span class="hl">Te faltan sistemas.</span></h1>
+      <div class="grid g3">
+        <div class="card">
+          <span class="tag">Caso 1</span>
+          <h3>El que no arrancó</h3>
+          <p>Consumiste contenido gratis, pero a la hora de ejecutar te frena el miedo a tirar la plata.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Caso 2</span>
+          <h3>El que testea sin parar</h3>
+          <p>10, 20, 30 productos quemados buscando un “winner” que nunca pega.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Caso 3</span>
+          <h3>El que está estancado</h3>
+          <p>Facturás, pero los ads se mueren, los márgenes se achican y dependés solo de Meta.</p>
+        </div>
+      </div>
+      <div class="feature">No se trata de encontrar productos ganadores. <em>Se trata de construir sistemas que hagan vender.</em></div>
+    </div>
+  </section>
+
+  <!-- 04 · LOS 3 PILARES -->
+  <section class="slide" data-label="El sistema">
+    <div class="wrap">
+      <span class="eyebrow">El sistema Genesis OS</span>
+      <h1>Tres pilares.<br><span class="dim">Aplicados en orden.</span></h1>
+      <div class="flow">
+        <div class="step"><div class="num">01</div><h3>Fundaciones</h3><p>Producto correcto, validado con investigación real.</p></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="num">02</div><h3>Estructura</h3><p>Infraestructura operativa, fiscal y de márgenes.</p></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="num">03</div><h3>Escalado</h3><p>Sistemas de tráfico y equipo para crecer estable.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 · PILAR 1 -->
+  <section class="slide" data-label="Pilar 01">
+    <div class="wrap">
+      <span class="eyebrow">Pilar 01 · Fundaciones</span>
+      <h1>Dejá de buscar productos.<br><span class="hl">Buscá problemas con plata detrás.</span></h1>
+      <ul class="bullets">
+        <li>Primero el problema, después el producto que lo resuelve <b>mejor que nadie</b>.</li>
+        <li><b>IA #1:</b> filtra cualquier producto en 10 minutos — ¿va o no va?</li>
+        <li><b>IA #2:</b> investigación profunda — avatar, dolores, lenguaje y ángulos que venden.</li>
+        <li>Invertís en 1 o 2 productos con research, no en 10 a la suerte.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 06 · PILAR 2 -->
+  <section class="slide" data-label="Pilar 02">
+    <div class="wrap">
+      <span class="eyebrow">Pilar 02 · Estructura</span>
+      <h1>Toda la infraestructura,<br><span class="hl">lista y andando.</span></h1>
+      <ul class="bullets">
+        <li><b>Costeo completo:</b> sabés exactamente cuánto te queda de cada venta.</li>
+        <li>Parte fiscal en regla y proveedores asegurados — meses de búsqueda ahorrados.</li>
+        <li>Logística delegada + tracking de ganancia y métricas en tiempo real.</li>
+        <li>Landings y oferta con estructuras ya validadas en mis marcas.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 07 · PILAR 3 -->
+  <section class="slide" data-label="Pilar 03">
+    <div class="wrap">
+      <span class="eyebrow">Pilar 03 · Escalado</span>
+      <h1>Con base sólida,<br><span class="hl">encendemos el motor.</span></h1>
+      <ul class="bullets">
+        <li><b>Sistema de creativos:</b> decenas de anuncios nuevos cada semana.</li>
+        <li>Lo que funciona va a escala; los reemplazos siempre están listos.</li>
+        <li>Nuevos canales — TikTok, Mercado Libre — y email automatizado.</li>
+        <li>Equipo y sistemas para que el negocio no dependa de vos 14 horas.</li>
+      </ul>
+      <div class="eq">
+        <span class="term">Producto<br>validado</span>
+        <span class="op">+</span>
+        <span class="term">Estructura<br>sólida</span>
+        <span class="op">+</span>
+        <span class="term">Anuncios<br>constantes</span>
+        <span class="op">=</span>
+        <span class="term res">Escala<br>estable</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 · PRUEBA SOCIAL -->
+  <section class="slide" data-label="Resultados">
+    <div class="wrap">
+      <span class="eyebrow">Resultados reales</span>
+      <h1>El mismo proceso,<br><span class="dim">distintos puntos de partida.</span></h1>
+      <div class="grid g3">
+        <div class="card">
+          <span class="tag">Cande · de 0</span>
+          <div class="big">45M</div>
+          <p>Su primer mes operativo. Hoy estable en 2–3M por día con <b style="color:var(--accent)">35% de profit</b>.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Joaco & Fran · a pérdida</span>
+          <div class="big">+100M</div>
+          <p>Por mes con 30% de margen. Ahora van camino a los 200–300M.</p>
+        </div>
+        <div class="card">
+          <span class="tag">José · de 0</span>
+          <div class="big">150M</div>
+          <p>Al mes. Mi primer alumno uno a uno, hoy con marca consolidada.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 · ENTREGABLES -->
+  <section class="slide" data-label="Cómo trabajamos">
+    <div class="wrap">
+      <span class="eyebrow">Cómo trabajamos</span>
+      <h1>Todo lo que necesitás,<br><span class="hl">en un solo lugar.</span></h1>
+      <div class="grid g2">
+        <div class="card"><span class="tag">Formación</span><h3>Curso en Skool</h3><p>+30 horas con el sistema paso a paso.</p></div>
+        <div class="card"><span class="tag">Recursos</span><h3>Herramientas operativas</h3><p>Calculadoras de costeo, plantillas e IAs listas para usar.</p></div>
+        <div class="card"><span class="tag">Red</span><h3>Contactos validados</h3><p>Proveedores, fabricantes, laboratorios y editores.</p></div>
+        <div class="card"><span class="tag">Acompañamiento</span><h3>1:1 real</h3><p>Chat 24/7, sesiones semanales y un 1:1 cada 15 días.</p></div>
+      </div>
+      <div class="feature"><em>Jamás vas a no saber qué hacer.</em> Siempre estamos ahí para resolver tus trabas.</div>
+    </div>
+  </section>
+
+  <!-- 10 · PREPARACIÓN -->
+  <section class="slide" data-label="Tu sesión">
+    <div class="wrap">
+      <span class="eyebrow">Para tu sesión</span>
+      <h1>Tres cosas y la reunión<br><span class="hl">rinde 10 veces más.</span></h1>
+      <div class="grid g3">
+        <div class="card"><div class="big">01</div><h3>Conectate puntual</h3><p>Respetar el horario hace que aprovechemos cada minuto.</p></div>
+        <div class="card"><div class="big">02</div><h3>Desde la compu</h3><p>No desde el celular: vamos a compartir pantalla y ver todo bien.</p></div>
+        <div class="card"><div class="big">03</div><h3>Lugar tranquilo</h3><p>Sin distracciones y con buena señal.</p></div>
+      </div>
+      <p class="closing">Hacé esas tres cosas y <span class="hl">nos vemos dentro.</span></p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const deck = document.getElementById('deck');
+  const slides = [...document.querySelectorAll('.slide')];
+  const dotsNav = document.getElementById('dots');
+  const cur = document.getElementById('cur');
+  const tot = document.getElementById('tot');
+  const hint = document.querySelector('.hint');
+  tot.textContent = String(slides.length).padStart(2,'0');
+
+  // build dot nav
+  slides.forEach((s,i)=>{
+    const b=document.createElement('button');
+    b.title=s.dataset.label||('Slide '+(i+1));
+    b.addEventListener('click',()=>slides[i].scrollIntoView({behavior:'smooth'}));
+    dotsNav.appendChild(b);
+  });
+  const dots=[...dotsNav.children];
+
+  let active=0;
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+        active=slides.indexOf(e.target);
+        cur.textContent=String(active+1).padStart(2,'0');
+        dots.forEach((d,i)=>d.classList.toggle('active',i===active));
+      }
+    });
+  },{threshold:0.55});
+  slides.forEach(s=>io.observe(s));
+
+  // keyboard navigation
+  function go(dir){
+    const n=Math.min(Math.max(active+dir,0),slides.length-1);
+    slides[n].scrollIntoView({behavior:'smooth'});
+  }
+  window.addEventListener('keydown',(e)=>{
+    if(['ArrowDown','ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(1);}
+    if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(-1);}
+  });
+
+  // fade the hint after a bit of interaction
+  let scrolled=false;
+  deck.addEventListener('scroll',()=>{ if(!scrolled){scrolled=true;hint.style.opacity=0;} },{once:true});
+</script>
+</body>
+</html>
