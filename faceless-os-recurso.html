@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FACELESS OS · Guía de Arranque</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0A0B;
+    --bg-raised:#121214;
+    --line:rgba(255,255,255,.10);
+    --line-strong:rgba(255,255,255,.18);
+    --text:#EDEBE7;
+    --dim:#8A8A8F;
+    --dim-2:#5E5E63;
+    --red:#FF3B3B;
+    --red-deep:#C81E2A;
+    --red-glow:rgba(255,59,59,.14);
+    --maxw:1180px;
+    --pad:clamp(20px,5vw,84px);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Inter",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  /* subtle ambient grain/grid */
+  body::before{
+    content:"";
+    position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(120% 80% at 80% -10%, var(--red-glow), transparent 55%),
+      linear-gradient(to bottom, rgba(255,255,255,.015), transparent 30%);
+  }
+
+  /* ---------- scroll deck ---------- */
+  .deck{
+    height:100vh;
+    overflow-y:scroll;
+    scroll-snap-type:y proximity;
+    position:relative;
+    z-index:1;
+  }
+  .slide{
+    min-height:100vh;
+    scroll-snap-align:start;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:clamp(96px,12vh,140px) var(--pad) clamp(72px,9vh,110px);
+    position:relative;
+    border-bottom:1px solid transparent;
+  }
+  .wrap{width:100%;max-width:var(--maxw);margin:0 auto}
+
+  /* ---------- persistent chrome ---------- */
+  .chrome{position:fixed;z-index:5;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--dim);pointer-events:none}
+  .chrome--counter{top:26px;left:var(--pad)}
+  .chrome--counter b{color:var(--text);font-weight:700}
+  .chrome--brand{top:26px;right:var(--pad);display:flex;align-items:center;gap:9px}
+  .dot-live{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @media (prefers-reduced-motion:reduce){.dot-live{animation:none}}
+
+  .navhint{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:5;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.22em;color:var(--dim-2);display:flex;align-items:center;gap:8px}
+  .navhint .arrow{animation:bob 1.8s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+  @media (prefers-reduced-motion:reduce){.navhint .arrow{animation:none}}
+
+  /* dot nav */
+  .dotnav{position:fixed;top:50%;right:18px;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:11px}
+  .dotnav button{appearance:none;border:0;padding:0;width:9px;height:9px;border-radius:50%;background:transparent;border:1.5px solid var(--line-strong);cursor:pointer;transition:all .25s ease}
+  .dotnav button:hover{border-color:var(--text)}
+  .dotnav button[aria-current="true"]{background:var(--red);border-color:var(--red);box-shadow:0 0 9px var(--red-glow)}
+  .dotnav button:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+
+  /* ---------- type system ---------- */
+  .eyebrow{font-family:"Space Mono",monospace;font-size:clamp(11px,1.1vw,13px);letter-spacing:.2em;text-transform:uppercase;color:var(--red);display:flex;align-items:center;gap:12px;margin:0 0 26px}
+  .eyebrow::before{content:"";width:34px;height:1px;background:var(--red);display:inline-block}
+  .eyebrow .muted{color:var(--dim)}
+
+  h1,h2{font-family:"Space Grotesk",sans-serif;font-weight:700;line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1{font-size:clamp(2.5rem,6.6vw,5.6rem)}
+  h2{font-size:clamp(2rem,4.6vw,3.7rem)}
+  .hl{color:var(--red)}
+  .lead{font-size:clamp(1.05rem,1.5vw,1.35rem);line-height:1.6;color:var(--text);max-width:64ch;margin:30px 0 0}
+  .body{font-size:clamp(1rem,1.25vw,1.12rem);line-height:1.65;color:var(--dim);max-width:62ch}
+  .body strong{color:var(--text);font-weight:600}
+  .body .red{color:var(--red);font-weight:600}
+
+  /* ---------- COVER ---------- */
+  .cover{text-align:center;align-items:center}
+  .cover .wrap{max-width:880px;display:flex;flex-direction:column;align-items:center}
+  .cover .eyebrow{justify-content:center}
+  .cover .eyebrow::before{display:none}
+  .boot{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.14em;color:var(--dim-2);margin-bottom:34px;min-height:16px}
+  .boot .cursor{display:inline-block;width:8px;height:14px;background:var(--red);margin-left:3px;transform:translateY(2px);animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  @media (prefers-reduced-motion:reduce){.boot .cursor{animation:none}}
+  .cover h1{font-size:clamp(2.8rem,8.5vw,6.4rem)}
+  .cover .kicker{font-family:"Space Mono",monospace;font-size:clamp(12px,1.3vw,15px);letter-spacing:.28em;text-transform:uppercase;color:var(--red);margin:0 0 20px}
+  .cover .desc{font-size:clamp(1.02rem,1.6vw,1.3rem);line-height:1.6;color:var(--dim);max-width:46ch;margin:34px auto 0}
+  .cover .desc b{color:var(--text);font-weight:600}
+  .specbar{margin-top:46px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  .chip{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;color:var(--text);border:1px solid var(--line-strong);border-radius:100px;padding:9px 16px;background:rgba(255,255,255,.02)}
+  .chip b{color:var(--red);font-weight:700}
+  .ruleline{width:1px;height:54px;background:linear-gradient(var(--red),transparent);margin:40px auto 0}
+
+  /* ---------- compare cards (slide 2 style) ---------- */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:42px;max-width:920px}
+  .card{border:1px solid var(--line);border-radius:14px;padding:26px 24px;background:var(--bg-raised)}
+  .card .tag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+  .card h3{font-family:"Space Grotesk",sans-serif;font-size:1.18rem;font-weight:600;margin:0 0 10px;line-height:1.25}
+  .card p{margin:0;font-size:.98rem;line-height:1.55;color:var(--dim)}
+  .card--bad{}
+  .card--good{border-color:rgba(255,59,59,.4);background:linear-gradient(180deg,rgba(255,59,59,.06),var(--bg-raised))}
+  .card--good h3{color:var(--text)}
+  .card .arrowtag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;margin-top:16px;color:var(--dim-2)}
+  .card--good .arrowtag{color:var(--red)}
+
+  /* ---------- feature rows / model ---------- */
+  .rows{margin-top:40px;border-top:1px solid var(--line);max-width:900px}
+  .row{display:grid;grid-template-columns:64px 1fr;gap:22px;padding:24px 0;border-bottom:1px solid var(--line)}
+  .row .ix{font-family:"Space Mono",monospace;font-size:13px;color:var(--red);letter-spacing:.05em;padding-top:4px}
+  .row h3{font-family:"Space Grotesk",sans-serif;font-size:1.22rem;font-weight:600;margin:0 0 7px;letter-spacing:-.01em}
+  .row p{margin:0;color:var(--dim);font-size:1rem;line-height:1.6;max-width:60ch}
+  .row p .red{color:var(--red);font-weight:600}
+
+  /* ---------- pillar slides ---------- */
+  .pillar .phead{display:flex;align-items:baseline;gap:22px;flex-wrap:wrap}
+  .pillar .pnum{font-family:"Space Mono",monospace;font-size:clamp(2.4rem,7vw,5rem);font-weight:700;color:rgba(255,59,59,.22);line-height:.9;letter-spacing:-.02em}
+  .pillar h2{max-width:18ch}
+  .pillar .lead{margin-top:24px;max-width:70ch;color:var(--text)}
+  .steps{margin-top:36px;display:grid;gap:2px;max-width:980px}
+  .step{display:grid;grid-template-columns:54px 1fr;gap:20px;padding:20px 22px;background:var(--bg-raised);border:1px solid var(--line);border-radius:12px}
+  .step .si{font-family:"Space Mono",monospace;font-size:13px;color:var(--red);padding-top:3px}
+  .step h4{font-family:"Space Grotesk",sans-serif;font-size:1.08rem;font-weight:600;margin:0 0 7px}
+  .step p{margin:0;color:var(--dim);font-size:.98rem;line-height:1.6}
+  .step p strong{color:var(--text);font-weight:600}
+  .errnote{margin-top:26px;display:flex;gap:14px;align-items:flex-start;border-left:2px solid var(--red);padding:4px 0 4px 18px;max-width:64ch}
+  .errnote .lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--red);text-transform:uppercase;white-space:nowrap;padding-top:3px}
+  .errnote p{margin:0;color:var(--dim);font-size:.96rem;line-height:1.55}
+  .errnote p b{color:var(--text)}
+
+  /* ---------- proof slide ---------- */
+  .proof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:42px;max-width:1000px}
+  .proof{border:1px solid var(--line);border-radius:13px;padding:24px 22px;background:var(--bg-raised);position:relative;overflow:hidden}
+  .proof::after{content:"";position:absolute;top:0;left:0;width:3px;height:100%;background:var(--red);opacity:.7}
+  .proof .num{font-family:"Space Grotesk",sans-serif;font-size:1.9rem;font-weight:700;color:var(--text);letter-spacing:-.02em;line-height:1}
+  .proof .who{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;color:var(--red);margin:6px 0 12px;text-transform:uppercase}
+  .proof p{margin:0;color:var(--dim);font-size:.94rem;line-height:1.5}
+  .proof--agg{background:linear-gradient(180deg,rgba(255,59,59,.08),var(--bg-raised));border-color:rgba(255,59,59,.35)}
+
+  /* ---------- close ---------- */
+  .close{text-align:left}
+  .close .wrap{max-width:840px}
+  .close h2{max-width:16ch}
+  .signoff{margin-top:38px;font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.1em;color:var(--dim);display:flex;flex-direction:column;gap:8px}
+  .signoff .go{color:var(--red)}
+
+  /* ---------- reveal animation ---------- */
+  .reveal>*{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in>*{opacity:1;transform:none}
+  .reveal.in>*:nth-child(2){transition-delay:.07s}
+  .reveal.in>*:nth-child(3){transition-delay:.14s}
+  .reveal.in>*:nth-child(4){transition-delay:.21s}
+  .reveal.in>*:nth-child(5){transition-delay:.28s}
+  @media (prefers-reduced-motion:reduce){.reveal>*{opacity:1;transform:none;transition:none}}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:720px){
+    .cards{grid-template-columns:1fr}
+    .row{grid-template-columns:44px 1fr;gap:14px}
+    .step{grid-template-columns:40px 1fr;gap:14px;padding:18px}
+    .dotnav{right:10px}
+    .chrome{font-size:11px}
+    .navhint{display:none}
+  }
+
+  /* ---------- print -> real PDF export ---------- */
+  @media print{
+    @page{size:landscape;margin:0}
+    html,body{height:auto}
+    body::before{display:none}
+    .deck{height:auto;overflow:visible}
+    .chrome,.navhint,.dotnav{display:none}
+    .slide{min-height:auto;page-break-after:always;break-after:page;padding:48px 56px}
+    .reveal>*{opacity:1!important;transform:none!important}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+
+<div class="chrome chrome--counter"><b id="cur">01</b> / <span id="total">11</span></div>
+<div class="chrome chrome--brand"><span class="dot-live"></span> FACELESS&nbsp;LATAM™</div>
+<nav class="dotnav" id="dotnav" aria-label="Navegación de secciones"></nav>
+<div class="navhint"><span class="arrow">↓</span> NAVEGAR</div>
+
+<main class="deck" id="deck">
+
+  <!-- 01 · PORTADA -->
+  <section class="slide cover" data-label="Portada">
+    <div class="wrap reveal">
+      <div class="boot" id="boot"></div>
+      <p class="kicker">Método Faceless LATAM™ · Guía de arranque</p>
+      <h1>El activo en USD que<br>construís <span class="hl">sin tu cara.</span></h1>
+      <p class="desc">Cómo arrancar tus canales de <b>YouTube Faceless</b> a la par de tu trabajo o tu negocio — dedicándole <b>2 a 3 horas por día</b>.</p>
+      <div class="specbar">
+        <span class="chip">PDF · <b>guía de arranque</b></span>
+        <span class="chip">sin mostrar la <b>cara</b></span>
+        <span class="chip">sin invertir en <b>stock</b></span>
+        <span class="chip">sin renunciar a tu <b>trabajo</b></span>
+      </div>
+      <div class="ruleline"></div>
+    </div>
+  </section>
+
+  <!-- 02 · EL PROBLEMA -->
+  <section class="slide" data-label="El riesgo de 2026">
+    <div class="wrap reveal">
+      <p class="eyebrow">Punto de partida <span class="muted">// por qué leés esto</span></p>
+      <h2>Depender de un solo ingreso<br>es el <span class="hl">riesgo más caro</span> de 2026.</h2>
+      <p class="lead">No importa cuánto ganes hoy. Si todo lo que entra depende de una sola fuente —tu sueldo, tu facturación, tus clientes— estás expuesto. Tocaste un techo de ingresos y de tiempo, y la salida no es trabajar más horas: es construir un segundo motor que no canibalice lo que ya tenés.</p>
+      <div class="cards">
+        <div class="card card--bad">
+          <div class="tag">Camino A</div>
+          <h3>Sumar más horas al mismo motor</h3>
+          <p>Más clientes, más guardias, más turnos. El ingreso sube un poco; el tiempo libre desaparece. El techo sigue ahí, solo que ahora más arriba y más caro.</p>
+          <div class="arrowtag">→ MISMO INTERCAMBIO: TIEMPO POR DINERO</div>
+        </div>
+        <div class="card card--good">
+          <div class="tag">Camino B</div>
+          <h3>Construir un activo paralelo en USD</h3>
+          <p>Un sistema que produce ingresos sin tu presencia, escalable y delegable. Arranca chico, en paralelo, y con el tiempo se vuelve semipasivo. Ese es el plan B sólido.</p>
+          <div class="arrowtag">→ UN ACTIVO QUE TRABAJA SIN VOS</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 · QUÉ ES FACELESS -->
+  <section class="slide" data-label="Qué es Faceless">
+    <div class="wrap reveal">
+      <p class="eyebrow">El modelo <span class="muted">// definición</span></p>
+      <h2>Qué es, en concreto,<br>un canal de <span class="hl">YouTube Faceless</span>.</h2>
+      <p class="body" style="margin-top:26px">Es un canal de YouTube que monetiza vía <strong>AdSense</strong> —Google te paga por las publicidades que corren en tus videos— pero donde <strong>vos nunca aparecés</strong>. No hablás a cámara, no construís marca personal, no sos influencer. El video se arma con guion, una voz generada con IA y material visual editado. Es contenido, no exposición.</p>
+      <div class="rows">
+        <div class="row"><div class="ix">A.</div><div><h3>No es marca personal</h3><p>Nadie tiene que conocer tu cara ni tu nombre. El que mira el video consume el contenido, no a vos. Esto te descalifica del 90% de los negocios digitales que exigen exponerte — y te habilita el que no.</p></div></div>
+        <div class="row"><div class="ix">B.</div><div><h3>No es stock ni dropshipping</h3><p>No comprás productos, no manejás envíos, no tenés inventario ni atención al cliente. <span class="red">Cero capital inmovilizado.</span> El producto es el video; el costo es tu tiempo y unas herramientas de IA.</p></div></div>
+        <div class="row"><div class="ix">C.</div><div><h3>Paga en dólares y es delegable</h3><p>AdSense liquida en USD a tu cuenta de LATAM. Y como todo es proceso —guion, voz, edición— se documenta y se delega. Pasás de hacerlo a dirigirlo.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 · POR QUÉ AHORA -->
+  <section class="slide" data-label="Por qué 2026">
+    <div class="wrap reveal">
+      <p class="eyebrow">La ventana <span class="muted">// por qué sí o sí ahora</span></p>
+      <h2>Por qué <span class="hl">2026</span> es el momento,<br>y por qué no va a durar.</h2>
+      <p class="lead">Tres cosas se alinearon al mismo tiempo. Cuando la masa las entienda, el océano azul se vuelve rojo. Hoy todavía está abierto.</p>
+      <div class="rows">
+        <div class="row"><div class="ix">01</div><div><h3>La IA derribó la barrera de producción</h3><p>Lo que antes pedía un equipo —guionista, locutor, editor— hoy lo hace una sola persona en horas, con herramientas que cuestan poco. La excusa de "no tengo skills técnicas" dejó de existir.</p></div></div>
+        <div class="row"><div class="ix">02</div><div><h3>YouTube reparte miles de millones, y el español está casi vacío</h3><p>Los formadores de Faceless apuntan a jóvenes sin recursos en inglés. Los de ingresos pasivos no enseñan Faceless. <span class="red">El mercado en español, para un perfil profesional, es océano azul.</span></p></div></div>
+        <div class="row"><div class="ix">03</div><div><h3>Depender de un solo ingreso nunca fue tan riesgoso</h3><p>Un activo en USD, escalable y delegable, es el contrapeso. No es "otro proyecto que te come tiempo": bien armado, en 2-3 hs/día arranca y después se delega.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 · MODELO HÍBRIDO -->
+  <section class="slide" data-label="Modelo híbrido">
+    <div class="wrap reveal">
+      <p class="eyebrow">La arquitectura <span class="muted">// antes de los 3 pilares</span></p>
+      <h2>Un sistema híbrido:<br>cash-flow <span class="hl">hoy</span>, activo <span class="hl">para siempre.</span></h2>
+      <p class="lead">El error de los que arrancan solos es elegir una sola velocidad. El sistema corre dos en paralelo desde el principio — y delega desde el día uno.</p>
+      <div class="cards">
+        <div class="card card--good">
+          <div class="tag">Motor 1 · velocidad</div>
+          <h3>Canales de Tendencia</h3>
+          <p>Temas que explotan AHORA. Generan tráfico y monetización rápido — en semanas, no en años. Te dan el primer ingreso, la prueba de que funciona y el envión para reinvertir.</p>
+          <div class="arrowtag">→ CASH-FLOW EN SEMANAS</div>
+        </div>
+        <div class="card card--good">
+          <div class="tag">Motor 2 · patrimonio</div>
+          <h3>Canales Evergreen</h3>
+          <p>Temas atemporales que se siguen viendo dentro de dos años. Crecen más lento pero se vuelven semipasivos: el activo de verdad, el que podés mantener, escalar o incluso vender.</p>
+          <div class="arrowtag">→ INGRESO SEMIPASIVO DE LARGO PLAZO</div>
+        </div>
+      </div>
+      <p class="body" style="margin-top:28px">Y atravesando los dos motores: <strong>delegación desde temprano.</strong> Cada parte del proceso se documenta para que no dependa de tus horas. Ese es el puente entre "tener un canal" y "tener un sistema".</p>
+    </div>
+  </section>
+
+  <!-- 06 · LOS 3 PILARES (divisor) -->
+  <section class="slide" data-label="Los 3 pilares">
+    <div class="wrap reveal">
+      <p class="eyebrow">El método <span class="muted">// mapa de ejecución</span></p>
+      <h2>Todo el sistema entra<br>en <span class="hl">3 pilares.</span></h2>
+      <div class="rows">
+        <div class="row"><div class="ix">P1</div><div><h3>Nicho</h3><p>Elegís y validás el terreno con IA. La decisión que define el 80% del resultado antes de grabar un solo segundo.</p></div></div>
+        <div class="row"><div class="ix">P2</div><div><h3>Producción con IA, sin cara</h3><p>Convertís una idea en un video listo para subir. Guion, voz, visuales y edición — la línea de montaje.</p></div></div>
+        <div class="row"><div class="ix">P3</div><div><h3>Monetización, cobro y delegación</h3><p>Encendés AdSense, cobrás en USD y delegás. Acá el canal deja de depender de tu tiempo y se vuelve activo.</p></div></div>
+      </div>
+      <p class="body" style="margin-top:26px">Los próximos tres bloques los desarrollan uno por uno, en profundidad.</p>
+    </div>
+  </section>
+
+  <!-- 07 · PILAR 1 -->
+  <section class="slide pillar" data-label="Pilar 1 · Nicho">
+    <div class="wrap reveal">
+      <p class="eyebrow">Pilar 01 / 03 <span class="muted">// la decisión que define todo</span></p>
+      <div class="phead">
+        <span class="pnum">01</span>
+        <h2>El nicho: <span class="hl">elegís dónde competís</span> antes de competir.</h2>
+      </div>
+      <p class="lead">En Faceless, el nicho no es un detalle de gusto — es la variable que define cuánto te paga YouTube por cada mil reproducciones (el CPM), qué tan fácil es producir el contenido 100% con IA, y en cuánto tiempo monetizás. Un video bueno en un nicho malo no escala. Un video promedio en un nicho bueno, sí.</p>
+      <div class="steps">
+        <div class="step"><div class="si">1.1</div><div><h4>Validás con datos, no con tu gusto</h4><p>Mirás tres señales: <strong>demanda</strong> (cuánta gente busca ese tema), <strong>competencia</strong> (si hay canales nuevos creciendo rápido = océano abierto) y <strong>CPM</strong> (temas e idiomas que los anunciantes pagan más caro). Se hace con IA y herramientas de espionaje en unos 30 minutos, no en semanas de intuición.</p></div></div>
+        <div class="step"><div class="si">1.2</div><div><h4>Replicás fórmulas probadas en inglés y las traés al español</h4><p>No inventás de cero. Buscás nichos que ya estallaron en inglés, donde la fórmula está validada, y los cruzás al mercado hispano —que está mucho menos saturado. Es el atajo del <strong>early adopter</strong>: leés la ola antes de que rompa.</p></div></div>
+        <div class="step"><div class="si">1.3</div><div><h4>Elegís un nicho 100% producible con IA</h4><p>El criterio no es solo que pague: tiene que poder armarse sin grabarte, con biblioteca de temas prácticamente infinita para no quedarte sin ideas en el video 15. Si el nicho exige tu cara o tu testimonio, queda descartado.</p></div></div>
+        <div class="step"><div class="si">1.4</div><div><h4>Definís el rol Tendencia / Evergreen del nicho</h4><p>Cada nicho entra en el sistema con una función: capitalizarte rápido (Tendencia) o construir patrimonio (Evergreen). Esa etiqueta define el ritmo de publicación y las expectativas de cada canal.</p></div></div>
+      </div>
+      <div class="errnote"><span class="lbl">El error que evita el sistema</span><p>Elegir un nicho <b>por pasión y no por datos.</b> Te encariñás con un tema que no paga, producís 20 videos y abandonás creyendo que "el modelo no funciona". No falló el modelo: falló el primer pilar.</p></div>
+    </div>
+  </section>
+
+  <!-- 08 · PILAR 2 -->
+  <section class="slide pillar" data-label="Pilar 2 · Producción">
+    <div class="wrap reveal">
+      <p class="eyebrow">Pilar 02 / 03 <span class="muted">// la línea de montaje</span></p>
+      <div class="phead">
+        <span class="pnum">02</span>
+        <h2>Producción con IA: <span class="hl">de una idea a un video</span> sin grabar.</h2>
+      </div>
+      <p class="lead">Acá convertís un tema en un video listo para subir, sin cámara, sin set y sin editor profesional. Todo video es la suma de cuatro piezas —guion, voz, visuales y edición— y cada una tiene su herramienta. Es un flujo, no una inspiración.</p>
+      <div class="steps">
+        <div class="step"><div class="si">2.1</div><div><h4>Guion que retiene — con Claude</h4><p>Le pasás el tema y la IA te devuelve un guion optimizado para <strong>watch-time</strong>: un hook que frena el scroll en los primeros 3 segundos y una estructura que sostiene la atención. La retención es lo que YouTube premia — más que las vistas.</p></div></div>
+        <div class="step"><div class="si">2.2</div><div><h4>Voz natural — con MiniMax</h4><p>El guion se convierte en una locución en español neutro que no suena robótica. Esto es lo que antes pedía contratar a un locutor; ahora es un paso de minutos. Sin tu voz, sin tu cara — el canal no depende de tu disponibilidad.</p></div></div>
+        <div class="step"><div class="si">2.3</div><div><h4>Montaje con ritmo — con CapCut</h4><p>Sumás visuales (b-roll, stock, imágenes de IA) y los montás sobre la voz con un ritmo que sostiene la atención. No es edición de cine: es un patrón repetible que, una vez aprendido, sale rápido.</p></div></div>
+        <div class="step"><div class="si">2.4</div><div><h4>Miniatura + título: el 80% del clic</h4><p>El mejor video no se ve si nadie hace clic. Miniatura y título se trabajan aparte porque son los que mueven el <strong>CTR</strong>. Es lo último que se arma y lo primero que decide si el video despega.</p></div></div>
+      </div>
+      <div class="errnote"><span class="lbl">Dónde entran las 2-3 hs/día</span><p>Con la plantilla del nicho ya armada, los videos salen <b>en bloques, en serie</b> — varios por sesión, no uno por día sufrido. Y este pilar es el primero que delegás: le pasás el proceso documentado a un editor y recuperás tus horas.</p></div>
+    </div>
+  </section>
+
+  <!-- 09 · PILAR 3 -->
+  <section class="slide pillar" data-label="Pilar 3 · Monetización">
+    <div class="wrap reveal">
+      <p class="eyebrow">Pilar 03 / 03 <span class="muted">// de canal a activo</span></p>
+      <div class="phead">
+        <span class="pnum">03</span>
+        <h2>Monetización, cobro en USD y <span class="hl">delegación.</span></h2>
+      </div>
+      <p class="lead">Este es el pilar donde el canal deja de ser un proyecto y se convierte en un activo: encendés AdSense, la plata cae en dólares a tu cuenta de LATAM, y armás el sistema para que no dependa de tus horas.</p>
+      <div class="steps">
+        <div class="step"><div class="si">3.1</div><div><h4>Llegás a los requisitos de monetización</h4><p>YouTube habilita AdSense con <strong>1.000 suscriptores y 4.000 horas</strong> de visualización pública en 12 meses (o la vía de Shorts). Es el objetivo concreto de los primeros 60 días — y con un nicho bien elegido es alcanzable mucho antes de lo que la gente cree.</p></div></div>
+        <div class="step"><div class="si">3.2</div><div><h4>Cobrás en USD desde LATAM</h4><p>Acá se cae el mito: <span class="red">la plata de YouTube llega.</span> AdSense liquida en dólares a cuentas latinas —el propio Fabri cobra en Banco República, en Uruguay— sin necesidad de estructuras raras. El proceso de cobro se enseña paso a paso.</p></div></div>
+        <div class="step"><div class="si">3.3</div><div><h4>De un canal a un portafolio</h4><p>Un canal prueba el modelo. El ingreso de <strong>2.000 a 5.000 USD/mes</strong> sale de un portafolio de 2 a 4 canales combinando Tendencia (flujo) y Evergreen (patrimonio). Reinvertís el primer cash-flow en abrir los siguientes.</p></div></div>
+        <div class="step"><div class="si">3.4</div><div><h4>Delegás y recuperás el tiempo</h4><p>El paso que casi nadie da solo. Documentás el proceso en SOPs, sumás un editor, después un gestor. Pasás de <strong>operar a dirigir</strong>. Acá es exactamente donde el ingreso deja de depender de tus horas — y donde nace la libertad de tiempo.</p></div></div>
+      </div>
+      <div class="errnote"><span class="lbl">El error que evita el sistema</span><p>Quedarse de <b>auto-empleado</b> haciendo todo a mano para siempre. El sistema se piensa para delegarse desde el día uno: si no delegás, construiste otro trabajo, no un activo.</p></div>
+    </div>
+  </section>
+
+  <!-- 10 · PRUEBA -->
+  <section class="slide" data-label="La prueba">
+    <div class="wrap reveal">
+      <p class="eyebrow">La prueba <span class="muted">// no es teoría</span></p>
+      <h2>Gente común, con poco tiempo,<br>ya lo está <span class="hl">ejecutando.</span></h2>
+      <div class="proof-grid">
+        <div class="proof"><div class="num">7 días</div><div class="who">Mateo</div><p>Estudiante de medicina. Monetizó en 7 días y llegó a ~1.500 USD en 2 meses, estudiando a la par.</p></div>
+        <div class="proof"><div class="num">1 h/día</div><div class="who">Fefo · 36 años</div><p>Cuatro negocios en marcha. Le dedica una hora por día y monetizó en pocos días.</p></div>
+        <div class="proof"><div class="num">197€ → 840</div><div class="who">Jaime · España</div><p>Tenía un canal estancado en 197€. Con el sistema escaló a 600-840 USD/mes con el mismo canal.</p></div>
+        <div class="proof"><div class="num">+500 USD</div><div class="who">Luan</div><p>Trabaja en una feria. Un video por día, monetizó en 6 días y superó los 500 USD el primer mes.</p></div>
+        <div class="proof proof--agg"><div class="num">20 / 42</div><div class="who">Volumen real</div><p>20 de 42 alumnos monetizados en 4 meses. No es un caso aislado de suerte: es un sistema que se repite.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 · CIERRE -->
+  <section class="slide close" data-label="Siguiente paso">
+    <div class="wrap reveal">
+      <p class="eyebrow">Siguiente paso <span class="muted">// del mapa a la ejecución</span></p>
+      <h2>Ahora tenés el mapa.<br>Falta <span class="hl">ejecutarlo bien.</span></h2>
+      <p class="lead">Lo que acabás de leer es exactamente el sistema: tres pilares, dos motores, una lógica de delegación. La diferencia entre leerlo y tener resultados no es saber qué hacer — es ejecutarlo con un proceso probado, sin perder meses en los errores que ya están resueltos.</p>
+      <p class="body" style="margin-top:22px">Si querés construir esto con un sistema y no a los tropezones, el próximo paso es simple.</p>
+      <div class="signoff">
+        <span>// inicializaste FACELESS_OS</span>
+        <span class="go">→ escribime "EMPEZAR" y te muestro cómo seguir.</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const deck = document.getElementById('deck');
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotnav = document.getElementById('dotnav');
+  const curEl = document.getElementById('cur');
+  const totalEl = document.getElementById('total');
+  const pad2 = n => String(n).padStart(2,'0');
+  totalEl.textContent = pad2(slides.length);
+
+  // build dot nav
+  slides.forEach((s,i)=>{
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', (s.dataset.label||('Sección '+(i+1))));
+    b.addEventListener('click',()=>s.scrollIntoView({behavior:'smooth',block:'start'}));
+    dotnav.appendChild(b);
+  });
+  const dots = Array.from(dotnav.children);
+
+  // observe slides -> active state + reveal
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const i = slides.indexOf(e.target);
+        curEl.textContent = pad2(i+1);
+        dots.forEach((d,di)=>d.setAttribute('aria-current', di===i ? 'true':'false'));
+        e.target.querySelector('.reveal')?.classList.add('in');
+      }
+    });
+  },{root:deck, threshold:0.5});
+  slides.forEach(s=>io.observe(s));
+  // reveal first immediately
+  slides[0].querySelector('.reveal')?.classList.add('in');
+
+  // keyboard navigation
+  function currentIndex(){
+    const mid = deck.scrollTop + deck.clientHeight/2;
+    let idx=0;
+    slides.forEach((s,i)=>{ if(s.offsetTop<=mid) idx=i; });
+    return idx;
+  }
+  window.addEventListener('keydown',(ev)=>{
+    if(['ArrowDown','PageDown'].includes(ev.key)){ev.preventDefault();slides[Math.min(currentIndex()+1,slides.length-1)].scrollIntoView({behavior:'smooth'});}
+    else if(['ArrowUp','PageUp'].includes(ev.key)){ev.preventDefault();slides[Math.max(currentIndex()-1,0)].scrollIntoView({behavior:'smooth'});}
+    else if(ev.key==='Home'){ev.preventDefault();slides[0].scrollIntoView({behavior:'smooth'});}
+    else if(ev.key==='End'){ev.preventDefault();slides[slides.length-1].scrollIntoView({behavior:'smooth'});}
+  });
+
+  // cover boot sequence
+  const boot = document.getElementById('boot');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const bootText = '> inicializando faceless_os ...';
+  if(reduce){ boot.innerHTML = bootText + ' <span style="color:var(--red)">ok</span>'; }
+  else{
+    let i=0;
+    boot.innerHTML = '<span class="cursor"></span>';
+    const t = setInterval(()=>{
+      i++;
+      boot.innerHTML = bootText.slice(0,i) + '<span class="cursor"></span>';
+      if(i>=bootText.length){ clearInterval(t); boot.innerHTML = bootText + ' <span style="color:var(--red)">ok</span><span class="cursor"></span>'; }
+    }, 38);
+  }
+</script>
+</body>
+</html>
