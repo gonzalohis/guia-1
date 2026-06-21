@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Renovación Creativa — Genesis OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b09;
+    --bg-2:#101210;
+    --panel:#14160f;
+    --panel-2:#191c12;
+    --ink:#f4f3e9;
+    --ink-dim:#a0a293;
+    --ink-faint:#67695a;
+    --signal:#d4ff3f;
+    --signal-deep:#a4d400;
+    --warn:#ff7a3d;
+    --line:#262920;
+    --line-2:#33372a;
+    --display:'Bricolage Grotesque',Impact,sans-serif;
+    --body:'Hanken Grotesk',system-ui,sans-serif;
+    --mono:'Space Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.62;
+    font-size:16px;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(ellipse 90% 40% at 50% -8%, rgba(212,255,63,.09), transparent 62%),
+      radial-gradient(circle at 100% 102%, rgba(255,122,61,.05), transparent 46%);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.4;
+    background-image:
+      linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
+    background-size:38px 38px;
+    mask-image:radial-gradient(ellipse 100% 80% at 50% 0%, #000, transparent 75%);
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px;position:relative;z-index:2}
+
+  /* ============ COVER (screenshot-ready) ============ */
+  .cover-screen{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:46px 20px;position:relative;z-index:2;
+  }
+  .cover{
+    width:100%;max-width:560px;position:relative;
+    border:1px solid var(--line);border-radius:22px;
+    background:linear-gradient(180deg, rgba(25,28,18,.55), rgba(20,22,15,.35));
+    padding:46px 40px 38px;
+    box-shadow:0 30px 90px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03);
+    overflow:hidden;
+  }
+  .cover::before{
+    content:"";position:absolute;top:0;left:0;width:74px;height:74px;
+    border-top:2px solid var(--signal);border-left:2px solid var(--signal);
+    border-top-left-radius:22px;opacity:.7;
+  }
+  .cv-kick{
+    font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--signal);display:flex;align-items:center;gap:11px;margin-bottom:28px;
+    opacity:0;animation:rise .7s .05s forwards;
+  }
+  .cv-kick .dot{width:6px;height:6px;border-radius:50%;background:var(--signal);box-shadow:0 0 12px var(--signal)}
+  .cv-kick::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line-2),transparent)}
+  .cover h1{
+    font-family:var(--display);font-weight:800;line-height:.9;text-transform:uppercase;
+    font-size:clamp(50px,14vw,80px);letter-spacing:-.02em;
+  }
+  .cover h1 .a{display:block;opacity:0;animation:rise .8s .14s forwards}
+  .cover h1 .b{display:block;color:var(--signal);opacity:0;animation:rise .8s .24s forwards;text-shadow:0 0 38px rgba(212,255,63,.35)}
+  .cv-lede{margin-top:18px;font-family:var(--mono);font-size:14.5px;color:var(--ink-dim);letter-spacing:.02em;opacity:0;animation:rise .8s .34s forwards}
+  .cv-label{margin-top:32px;font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--signal-deep);display:flex;align-items:center;gap:9px;opacity:0;animation:rise .8s .42s forwards}
+  .cv-label::before{content:"";width:16px;height:1px;background:var(--signal-deep)}
+  .cv-items{margin-top:17px;display:grid;gap:10px}
+  .cv-item{
+    display:grid;grid-template-columns:36px 1fr;gap:13px;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px;
+    opacity:0;transform:translateY(14px);
+  }
+  .cv-item .n{font-family:var(--display);font-weight:800;font-size:18px;color:var(--signal);width:36px;height:36px;border:1px solid var(--line-2);border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--panel-2)}
+  .cv-item .t{font-size:14.5px;line-height:1.3;font-weight:500}
+  .cv-item .t span{color:var(--signal);font-family:var(--mono);font-size:11.5px}
+  .cv-item.big{background:linear-gradient(180deg,var(--panel-2),var(--panel));border-color:var(--signal-deep)}
+  .cv-item.big .n{background:var(--signal);color:#0a0b09;border-color:var(--signal);box-shadow:0 0 22px rgba(212,255,63,.3)}
+  .cv-item.big .t b{font-weight:700}
+  .cv-item:nth-child(1){animation:rise .6s .48s forwards}
+  .cv-item:nth-child(2){animation:rise .6s .56s forwards}
+  .cv-item:nth-child(3){animation:rise .6s .64s forwards}
+  .cv-item:nth-child(4){animation:rise .6s .72s forwards}
+  .cv-item:nth-child(5){animation:rise .6s .80s forwards}
+  .cv-foot{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;opacity:0;animation:rise .8s .9s forwards}
+  .cv-foot .brand{font-family:var(--display);font-weight:700;font-size:14.5px}
+  .cv-foot .brand b{color:var(--signal-deep)}
+  .cv-foot .desc{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:.04em;margin-top:5px}
+  .cv-tags{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}
+  .cv-tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line-2);border-radius:100px;padding:6px 12px;color:var(--ink-faint);white-space:nowrap}
+  .scrollcue{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;animation:rise 1s 1.1s forwards}
+  .scrollcue .ar{animation:bob 1.8s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+  /* ============ REFRAME ============ */
+  .reframe{padding:30px 0 8px}
+  .reframe .lead{font-family:var(--display);font-weight:700;font-size:clamp(23px,5.4vw,33px);line-height:1.16;letter-spacing:-.01em}
+  .reframe .lead .hl{color:var(--signal)}
+  .reframe p{margin-top:20px;color:var(--ink-dim);max-width:610px}
+  .reframe p strong{color:var(--ink);font-weight:600}
+  .quote{
+    margin-top:26px;border-left:2px solid var(--signal-deep);background:var(--panel);border-radius:0 12px 12px 0;
+    padding:18px 20px;font-style:italic;color:var(--ink-dim);font-size:15px;line-height:1.55;
+  }
+  .quote .who{display:block;font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ink-faint);margin-top:12px;text-transform:uppercase}
+
+  /* ============ PIPELINE ============ */
+  .pipe-head{padding:50px 0 6px;display:flex;align-items:baseline;gap:14px}
+  .pipe-head .n{font-family:var(--mono);font-size:12px;color:var(--signal);letter-spacing:.06em;white-space:nowrap}
+  .pipe-head h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(26px,6.4vw,42px);line-height:.96;letter-spacing:-.01em}
+  .pipe-intro{color:var(--ink-dim);max-width:600px;margin-bottom:6px}
+
+  .pipe{position:relative;margin-top:14px;padding-left:8px}
+  .pipe::before{content:"";position:absolute;left:30px;top:24px;bottom:120px;width:2px;background:linear-gradient(180deg,var(--signal-deep),var(--line-2) 80%, transparent);opacity:.5}
+
+  .station{position:relative;padding:0 0 30px 70px}
+  .station .node{position:absolute;left:8px;top:2px;width:46px;height:46px;border-radius:13px;background:var(--panel);border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:20px;color:var(--ink-dim);z-index:2}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:24px 24px 22px;transition:border-color .35s ease}
+  .card:hover{border-color:var(--line-2)}
+  .station.in .node{color:var(--signal);border-color:var(--signal-deep);box-shadow:0 0 0 4px rgba(212,255,63,.07), 0 6px 22px rgba(212,255,63,.12)}
+  .stat-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+  .card h3{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.01em;margin-top:7px;line-height:1.1}
+  .anti,.yes{font-family:var(--mono);font-size:11.5px;letter-spacing:.01em;line-height:1.45;margin-top:13px;display:flex;gap:9px;align-items:flex-start}
+  .anti{color:var(--warn)}
+  .yes{color:var(--signal);margin-top:7px}
+  .anti::before{content:"NO";font-weight:700;flex-shrink:0;opacity:.9}
+  .yes::before{content:"SÍ";font-weight:700;flex-shrink:0;opacity:.9}
+  .card p{margin-top:15px;color:var(--ink-dim);font-size:15px}
+  .card p strong{color:var(--ink);font-weight:600}
+  .card p .sig{color:var(--signal);font-weight:600}
+
+  .block{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+  .block .bh{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-deep);margin-bottom:13px;display:flex;align-items:center;gap:9px}
+  .block .bh::before{content:"";width:14px;height:1px;background:var(--signal-deep)}
+
+  .facts{display:grid;gap:0;border:1px solid var(--line-2);border-radius:11px;overflow:hidden}
+  .fact{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:12px 15px;border-top:1px solid var(--line)}
+  .fact:first-child{border-top:none}
+  .fact .fk{font-size:14px;color:var(--ink-dim);line-height:1.4}
+  .fact .fk b{color:var(--ink);font-weight:600}
+  .fact .fv{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--signal);white-space:nowrap;text-align:right}
+  .fact .fv.warn{color:var(--warn)}
+  .fact .fv.dim{color:var(--ink-faint)}
+
+  .list{margin-top:4px;display:grid;gap:9px}
+  .li{display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start;font-size:14.5px;color:var(--ink-dim);line-height:1.5}
+  .li::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--signal-deep);margin-top:8px;flex-shrink:0}
+  .li b{color:var(--ink);font-weight:600}
+
+  .steps{margin-top:4px;display:grid;gap:11px}
+  .stp{display:grid;grid-template-columns:26px 1fr;gap:12px;align-items:start}
+  .stp .sn{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--signal);border:1px solid var(--line-2);border-radius:7px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0}
+  .stp .st{font-size:14.5px;color:var(--ink-dim);line-height:1.5}
+  .stp .st b{color:var(--ink);font-weight:600}
+
+  .chips{margin-top:18px;display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;background:var(--panel-2);border:1px solid var(--line-2);color:var(--ink-dim);border-radius:7px;padding:6px 10px}
+  .chip b{color:var(--signal);font-weight:700}
+
+  .rule{margin-top:18px;font-family:var(--mono);font-size:12.5px;color:var(--ink);background:var(--bg);border:1px dashed var(--line-2);border-radius:10px;padding:14px 16px;line-height:1.55}
+  .rule b{color:var(--signal)}
+  .rule .w{color:var(--warn)}
+
+  .terminal .node{background:var(--signal);color:#0a0b09;border-color:var(--signal);box-shadow:0 0 0 5px rgba(212,255,63,.12), 0 8px 30px rgba(212,255,63,.3)}
+  .terminal.in .node{color:#0a0b09}
+  .terminal .card{background:linear-gradient(180deg,var(--panel-2),var(--panel));border-color:var(--signal-deep)}
+  .terminal .badge{font-family:var(--mono);font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--signal-deep);display:inline-block;margin-bottom:4px}
+
+  .vono{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+  .vo,.no{border:1px solid var(--line-2);border-radius:11px;padding:14px}
+  .vo .h,.no .h{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;font-weight:700}
+  .vo .h{color:var(--signal)}.no .h{color:var(--warn)}
+  .vo .it,.no .it{font-size:13.5px;color:var(--ink-dim);line-height:1.45;padding:6px 0;border-top:1px solid var(--line)}
+  .vo .it:first-of-type,.no .it:first-of-type{border-top:none}
+  .vo .it b,.no .it b{color:var(--ink);font-weight:600}
+
+  /* big stat band */
+  .statband{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .sb{border:1px solid var(--line-2);border-radius:12px;padding:16px 14px;background:var(--panel-2);text-align:center}
+  .sb .v{font-family:var(--display);font-weight:800;font-size:28px;color:var(--signal);line-height:1}
+  .sb .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-top:8px;line-height:1.4}
+
+  /* ============ CTA ============ */
+  .cta{margin:30px 0 0;text-align:center;border-top:1px solid var(--line);padding-top:52px}
+  .cta .small{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint)}
+  .cta h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(28px,7vw,46px);line-height:1.0;margin-top:16px;letter-spacing:-.01em}
+  .cta h2 .hl{color:var(--signal)}
+  .cta p{color:var(--ink-dim);max-width:470px;margin:18px auto 0;font-size:15.5px}
+  .keyword{display:inline-flex;align-items:center;gap:13px;margin-top:30px;font-family:var(--display);font-weight:800;font-size:clamp(40px,11vw,64px);letter-spacing:.02em;color:#0a0b09;background:var(--signal);padding:10px 40px;border-radius:16px;text-transform:uppercase;box-shadow:0 12px 44px rgba(212,255,63,.26)}
+  .keyword .arrow{font-size:.5em;transform:translateY(2px)}
+  .cta .fine{margin-top:16px;font-size:13.5px;color:var(--ink-faint)}
+  .cta .fine strong{color:var(--ink-dim)}
+  footer{padding:48px 0 64px;text-align:center;color:var(--ink-faint);font-family:var(--mono);font-size:11px;letter-spacing:.06em;line-height:1.7}
+  footer .brand{color:var(--signal-deep)}
+
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .obs{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+  .obs.in{opacity:1;transform:none}
+
+  @media(max-width:560px){
+    .wrap{padding:0 16px}
+    .cover{padding:36px 22px 28px;border-radius:18px}
+    .cover::before{border-top-left-radius:18px;width:58px;height:58px}
+    .cv-item{grid-template-columns:32px 1fr;gap:11px;padding:12px 13px}
+    .cv-item .n{width:32px;height:32px;font-size:16px}
+    .cv-item .t{font-size:13.5px}
+    .cv-foot{flex-direction:column;align-items:flex-start}.cv-tags{justify-content:flex-start}
+    .station{padding-left:58px}
+    .pipe::before{left:25px;bottom:150px}
+    .station .node{left:2px;width:42px;height:42px;font-size:18px}
+    .card{padding:20px 16px 18px}
+    .vono{grid-template-columns:1fr}
+    .fact{grid-template-columns:1fr;gap:5px}.fact .fv{justify-self:start;text-align:left}
+    .statband{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ COVER / SCREENSHOT ============ -->
+  <section class="cover-screen">
+    <div class="cover">
+      <div class="cv-kick"><span class="dot"></span>Genesis OS · Guía de operador</div>
+      <h1>
+        <span class="a">Renovación</span>
+        <span class="b">creativa</span>
+      </h1>
+      <p class="cv-lede">El sistema para no depender nunca de un solo ganador.</p>
+
+      <div class="cv-label">Lo que vas a encontrar adentro</div>
+      <div class="cv-items">
+        <div class="cv-item"><div class="n">1</div><div class="t">Por qué se te queman los anuncios <span>· la causa real</span></div></div>
+        <div class="cv-item"><div class="n">2</div><div class="t">El creativo ES el targeting <span>· el cambio de paradigma</span></div></div>
+        <div class="cv-item"><div class="n">3</div><div class="t">La regla 80/20 que nunca te deja sin ganador</div></div>
+        <div class="cv-item"><div class="n">4</div><div class="t">De dónde salen los conceptos <span>· ángulos + hooks</span></div></div>
+        <div class="cv-item big"><div class="n">5</div><div class="t"><b>El sistema de producción semanal (450 creativos/mes)</b></div></div>
+      </div>
+
+      <div class="cv-foot">
+        <div>
+          <div class="brand">GENESIS OS — <b>Manu Domínguez</b></div>
+          <div class="desc">De depender de la suerte a un sistema que renueva solo.</div>
+        </div>
+        <div class="cv-tags">
+          <span class="cv-tag">Lectura · 13 min</span>
+          <span class="cv-tag">Sin vendehumo</span>
+        </div>
+      </div>
+    </div>
+    <div class="scrollcue"><span>Deslizá</span><span class="ar">↓</span></div>
+  </section>
+
+  <div class="wrap">
+
+  <!-- ============ REFRAME ============ -->
+  <section class="reframe obs">
+    <p class="lead">Pegaste un ganador, lo escalaste… y dos semanas después el <span class="hl">CPA se fue al techo</span> y dejó de vender. No se "quemó" porque sí.</p>
+    <div class="quote">
+      "Manu, pegué un buen producto, los ads funcionaban de 10, traían ventas, los escalé… y ahora dos semanas después no sé si se quemaron o qué, pero el CPA está altísimo y ya no venden lo mismo."
+      <span class="who">— Un mensaje que me llega todas las semanas</span>
+    </div>
+    <p>Es de lo más común que existe, y casi siempre la gente le echa la culpa a Meta o cree que "se quemó el creativo" y listo. Pero la verdadera causa son dos cosas concretas, y las dos se resuelven con lo mismo: un sistema. Acá te lo explico entero.</p>
+  </section>
+
+  <!-- ============ PIPELINE ============ -->
+  <div class="pipe-head obs">
+    <span class="n">[ EL SISTEMA ]</span>
+    <h2>Renovación creativa, paso por paso</h2>
+  </div>
+  <p class="pipe-intro obs">Primero el diagnóstico de por qué se queman tus anuncios. Después el cambio de paradigma. Y al final, el sistema exacto de producción semanal que corro en mis marcas para no depender nunca de un solo creativo.</p>
+
+  <div class="pipe">
+
+    <!-- 1 -->
+    <div class="station obs">
+      <div class="node">1</div>
+      <div class="card">
+        <div class="stat-label">Diagnóstico · La causa real</div>
+        <h3>Por qué se te queman los anuncios</h3>
+        <p>El 99% de las veces no es culpa de Meta ni mala suerte. Son <strong>dos motivos</strong>, y casi siempre los dos juntos:</p>
+
+        <div class="block">
+          <div class="bh">Motivo 1 · Le hablás solo al público caliente</div>
+          <p style="margin-top:0">Si tus anuncios son <strong>100% de venta directa</strong> (oferta, descuento, "comprá ahora"), le estás hablando solo a la gente que ya está lista para comprarte. Ese público es <span class="sig">chiquito y muy específico</span>: se agota en semanas. Cuando lo saturás, la frecuencia se dispara y el CPA con ella.</p>
+          <p>Peor: si toda tu cuenta es oferta, Meta no le va a mostrar un "20% OFF" a alguien que no te conoce. Lo optimiza hacia quien ya interactuó. <strong>Tu cuenta se convierte en un retargeting gigante</strong>: dejás de prospectar, no entra gente nueva, y el pozo se seca.</p>
+        </div>
+
+        <div class="block">
+          <div class="bh">Motivo 2 · No tenés con qué reemplazarlo</div>
+          <p style="margin-top:0">Cuando ese creativo funcionó, <strong>solo iteraste sobre ÉL</strong>: le cambiaste el textito, el color, la musiquita. Nunca abriste conceptos nuevos de verdad. Entonces el día que se quema —y se quema siempre— no tenés nada en la recámara. Y Meta penaliza los creativos parecidos entre sí, así que esas variaciones ni siquiera te dan aire.</p>
+        </div>
+
+        <div class="block">
+          <div class="bh">La frecuencia te avisa antes (mirala en 3 niveles)</div>
+          <div class="facts">
+            <div class="fact"><div class="fk"><b>A nivel anuncio</b> · normal, Meta rota</div><div class="fv">1 – 3</div></div>
+            <div class="fact"><div class="fk"><b>A nivel ad set</b> · si sube, pocos creativos</div><div class="fv">3 – 8</div></div>
+            <div class="fact"><div class="fk"><b>A nivel cuenta</b> · si es alta, alarma</div><div class="fv warn">5 – 15+</div></div>
+          </div>
+          <div class="rule">Cuando la <b>frecuencia de cuenta</b> se va para arriba, no es que "se quemó un ad": es que <span class="w">necesitás más volumen de creativos urgente</span>. Es el síntoma de que no tenés sistema de renovación.</div>
+        </div>
+
+        <div class="chips">
+          <span class="chip">Solo venta directa</span><span class="chip">Público caliente agotado</span><span class="chip">Cero conceptos nuevos</span><span class="chip"><b>Frecuencia ↑</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="station obs">
+      <div class="node">2</div>
+      <div class="card">
+        <div class="stat-label">Paradigma · El creativo ES el targeting</div>
+        <h3>El targeting ya no se hace en la config</h3>
+        <div class="anti">Pensar que la segmentación se arregla con intereses, públicos custom y estructura.</div>
+        <div class="yes">Entender que hoy el que segmenta es el creativo — y por eso necesitás volumen y diversidad.</div>
+        <p>Meta confirmó que el <span class="sig">56% del targeting</span> se hace en base al creativo, no a la configuración de la campaña. Esto cambia todo: si el creativo es el que decide a quién le llega el ad, entonces tu palanca #1 no es tocar botones, es <strong>producir conceptos diversos</strong> que cubran a toda tu audiencia, no solo a la que ya está caliente.</p>
+
+        <div class="block">
+          <div class="bh">El embudo vive en los creativos, no en la cuenta</div>
+          <p style="margin-top:0">El TOF/MOF/BOF como estructura de campaña murió. Hoy se aplica a la <strong>distribución de tus creativos</strong>. Si no tenés creativos de la parte de arriba del embudo, nunca prospectás:</p>
+          <div class="facts" style="margin-top:13px">
+            <div class="fact"><div class="fk"><b>TOF</b> · awareness, problema, educación</div><div class="fv">60%</div></div>
+            <div class="fact"><div class="fk"><b>MOF</b> · mecanismo, consideración, proof</div><div class="fv">25%</div></div>
+            <div class="fact"><div class="fk"><b>BOF</b> · oferta, urgencia, descuento</div><div class="fv">15%</div></div>
+          </div>
+          <div class="rule">El error del Motivo 1 era tener el <span class="w">100% en BOF</span>. Acá ves por qué: <b>el 85% de tus creativos tienen que estar trayendo gente nueva</b>, no apretando a los que ya te conocen.</div>
+        </div>
+
+        <div class="chips">
+          <span class="chip"><b>56% = creativo</b></span><span class="chip">60 / 25 / 15</span><span class="chip">TOF trae gente nueva</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="station obs">
+      <div class="node">3</div>
+      <div class="card">
+        <div class="stat-label">El corazón del sistema · Regla 80/20</div>
+        <h3>80% conceptos nuevos · 20% iterar</h3>
+        <div class="anti">90% del tiempo iterando el ganador, 10% conceptos nuevos (al revés de lo que sirve).</div>
+        <div class="yes">80% conceptos nuevos, 20% iterar lo que ya funciona, cambiando una variable por vez.</div>
+        <p>Desde 2025 la <strong>diversidad de conceptos es el factor #1</strong> en la performance de una cuenta publicitaria. Meta penaliza lo parecido, así que <span class="sig">9 conceptos diferentes valen más que 9 variaciones</span> del mismo. La regla operativa que sostiene todo el sistema:</p>
+
+        <div class="block">
+          <div class="bh">Cómo se reparte cada semana</div>
+          <div class="facts">
+            <div class="fact"><div class="fk"><b>80%</b> · conceptos nuevos de cero</div><div class="fv">diversidad real</div></div>
+            <div class="fact"><div class="fk"><b>20%</b> · iterar ganadores</div><div class="fv">1 variable por vez</div></div>
+          </div>
+          <p>Así nunca dependés de un solo ganador: mientras uno se quema, ya tenés tres conceptos nuevos testeándose, y de ahí salen los próximos ganadores. La cuenta deja de vivir de la suerte y empieza a producir ganadores en serie.</p>
+        </div>
+
+        <div class="rule">"Iterar una variable por vez" es literal: cambiás <b>solo el hook</b>, o <b>solo el visual</b>, o <b>solo el copy</b> — nunca los tres juntos. Si cambiás todo, no sabés qué fue lo que movió la aguja.</div>
+
+        <div class="chips">
+          <span class="chip"><b>80 / 20</b></span><span class="chip">Diversidad &gt; cantidad</span><span class="chip">Factor #1 desde 2025</span><span class="chip">1 variable por vez</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="station obs">
+      <div class="node">4</div>
+      <div class="card">
+        <div class="stat-label">La materia prima · Ángulos + hooks</div>
+        <h3>De dónde salen los conceptos nuevos</h3>
+        <p>El 80% de conceptos nuevos no se inventa de la nada: <strong>sale de tu investigación</strong>. Cada ángulo del Doc B (cada dolor, cada buyer persona) es una mina de conceptos. La clave es no reciclar hooks entre ángulos.</p>
+
+        <div class="block">
+          <div class="bh">La multiplicación que te da volumen</div>
+          <p style="margin-top:0">No tenés que ser creativo "de inspiración". Es matemática:</p>
+          <div class="statband" style="margin-top:13px">
+            <div class="sb"><div class="v">3</div><div class="k">ángulos</div></div>
+            <div class="sb"><div class="v">3</div><div class="k">tipos de hook</div></div>
+            <div class="sb"><div class="v">3</div><div class="k">visuales</div></div>
+          </div>
+          <div class="rule">3 × 3 × 3 = <b>27 hooks distintos</b> de una sola tanda. Y de un solo buen hook salen 20-30 variaciones más combinando los 3 elementos.</div>
+        </div>
+
+        <div class="block">
+          <div class="bh">El hook se lleva el 80% del resultado</div>
+          <p style="margin-top:0">El <span class="sig">80% de la gente no pasa del hook</span> (los primeros 2-4 segundos). Su trabajo no es frenar a todos, es frenar al público <strong>correcto</strong>. Se compone de 3 elementos que evaluás por separado:</p>
+          <div class="list" style="margin-top:14px">
+            <div class="li"><span><b>Visual</b> (lo que se ve) · <b>Audio</b> (lo que se dice) · <b>Copy</b> (texto en pantalla). Cambiar uno solo puede duplicar el hook rate.</span></div>
+            <div class="li"><span><b>Criterios, en orden:</b> claridad → relevancia → novedad → especificidad → credibilidad.</span></div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="bh">Tipos de hook para variar conceptos</div>
+          <div class="list">
+            <div class="li"><span><b>Verdad contraria</b> — "el colágeno que tomás no sirve de nada".</span></div>
+            <div class="li"><span><b>Prueba específica</b> — "vendimos 4.200 unidades en 3 meses".</span></div>
+            <div class="li"><span><b>Warning</b> — "si usás esto todas las mañanas, te estás haciendo daño".</span></div>
+            <div class="li"><span><b>Curiosity gap</b> — "probé los 5 más vendidos, encontré 2 problemas en todos".</span></div>
+            <div class="li"><span><b>Mythbusting</b> — "si pensás que esto es humo, tenés razón… con la mayoría".</span></div>
+            <div class="li"><span><b>Promesa táctica</b> — "en 90 segundos te doy el checklist exacto".</span></div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="bh">La curva: del hook a la venta sin saltos</div>
+          <p style="margin-top:0">No se pasa del hook a vender de golpe. La conciencia de "me están vendiendo" sube como curva suave:</p>
+          <div class="facts" style="margin-top:13px">
+            <div class="fact"><div class="fk"><b>Hook</b> · frenar el scroll</div><div class="fv">0–3 s</div></div>
+            <div class="fact"><div class="fk"><b>Puente</b> · educar, bajar la guardia</div><div class="fv">3–10 s</div></div>
+            <div class="fact"><div class="fk"><b>Cuerpo</b> · mecanismo + mención casual</div><div class="fv">10–25 s</div></div>
+            <div class="fact"><div class="fk"><b>CTA</b> · conclusión natural</div><div class="fv">25–30 s</div></div>
+          </div>
+        </div>
+
+        <div class="chips">
+          <span class="chip">3×3×3 = 27</span><span class="chip">Hook = 80%</span><span class="chip">Visual·Audio·Copy</span><span class="chip">No reciclar entre ángulos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 — TERMINAL -->
+    <div class="station terminal obs">
+      <div class="node">5</div>
+      <div class="card">
+        <div class="badge">El sistema completo</div>
+        <div class="stat-label">Producción semanal · La que corro en mis marcas</div>
+        <h3>El sistema de producción semanal</h3>
+        <p>Acá está lo que hace que todo lo anterior sea sostenible: producir <strong>decenas de creativos nuevos por semana</strong>, en serie, sin depender de tu inspiración ni de un editor estrella. En mis marcas sacamos <span class="sig">~450 creativos nuevos por mes</span>.</p>
+
+        <div class="block" style="border-top-color:var(--line-2)">
+          <div class="bh">Por qué empezás por los estáticos</div>
+          <p style="margin-top:0">Las imágenes son el formato más subestimado para renovar: más baratas de producir, <strong>CPM más bajo</strong>, y testeás un ángulo en minutos. Con una sola frase que toca un dolor ya estás probando un concepto. Con un video, si el hook es malo, todo el video es malo. Por eso el grueso del testeo de ángulos arranca en estáticos, y lo que valida, recién ahí lo llevás a video.</p>
+        </div>
+
+        <div class="block" style="border-top-color:var(--line-2)">
+          <div class="bh">Los formatos que rotás</div>
+          <div class="vono">
+            <div class="vo">
+              <div class="h">Video</div>
+              <div class="it"><b>B-Roll</b> con voz en off</div>
+              <div class="it"><b>UGC humano</b> talking head</div>
+              <div class="it"><b>UGC con IA</b> para escalar volumen</div>
+              <div class="it"><b>Demo</b> / unboxing</div>
+            </div>
+            <div class="vo">
+              <div class="h">Imagen</div>
+              <div class="it"><b>Estático</b> con frase-ángulo</div>
+              <div class="it"><b>Before / after</b></div>
+              <div class="it"><b>Comparativa</b> vs genéricos</div>
+              <div class="it"><b>Características</b> y beneficios</div>
+            </div>
+          </div>
+          <div class="rule">Cada formato tiene que ser <b>congruente con el buyer persona</b>: si el ángulo le habla a "mamá agotada de 35", no puede aparecer un pibe de 20 hablando a cámara.</div>
+        </div>
+
+        <div class="block" style="border-top-color:var(--line-2)">
+          <div class="bh">El loop semanal</div>
+          <div class="steps">
+            <div class="stp"><div class="sn">1</div><div class="st"><b>Sacás del Doc B</b> los ángulos y buyer personas de la semana.</div></div>
+            <div class="stp"><div class="sn">2</div><div class="st"><b>Producís en bloque</b> aplicando 80/20 y la distribución 60/25/15.</div></div>
+            <div class="stp"><div class="sn">3</div><div class="st"><b>Subís y leés</b> con métricas de plataforma (no ROAS).</div></div>
+            <div class="stp"><div class="sn">4</div><div class="st"><b>Matás, escalás e iterás</b> — y la semana siguiente arranca de nuevo.</div></div>
+          </div>
+        </div>
+
+        <div class="block" style="border-top-color:var(--line-2)">
+          <div class="bh">Qué métricas mirás para decidir</div>
+          <p style="margin-top:0">Las decisiones de creativo (qué matar, qué escalar) se toman con métricas de plataforma, que son 100% confiables — <strong>no con el ROAS</strong>, que miente:</p>
+          <div class="facts" style="margin-top:13px">
+            <div class="fact"><div class="fk"><b>Hook rate</b> · retención a 3 seg</div><div class="fv">¿frena?</div></div>
+            <div class="fact"><div class="fk"><b>CTR saliente</b> · enganche del creativo</div><div class="fv">¿atrae?</div></div>
+            <div class="fact"><div class="fk"><b>CPC saliente</b> · costo del click</div><div class="fv">¿es caro?</div></div>
+            <div class="fact"><div class="fk"><b>Frecuencia</b> · saturación</div><div class="fv">¿se quema?</div></div>
+          </div>
+          <div class="rule">Diagnóstico rápido: <b>CTR alto + CPC alto</b> = problema de CPM, casi siempre por poca diversidad de creativos. ¿La señal? Más conceptos nuevos. Y a los ganadores saturados los revivís con <b>Zombie Cost Cap</b> en vez de tirarlos.</div>
+        </div>
+
+        <div class="rule" style="background:var(--bg-2)">Con este sistema corriendo, <b>nunca más dependés de un solo ganador</b>. Mientras uno se quema, ya tenés los próximos testeándose. <span class="w">La renovación deja de ser un apagar incendios y pasa a ser una máquina.</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ CTA ============ -->
+  <section class="cta obs">
+    <div class="small">¿Listo para armar tu fábrica?</div>
+    <h2>Dejá de rezarle al <span class="hl">próximo ganador</span>.<br>Construí el sistema que los produce.</h2>
+    <p>Si querés que veamos cómo montar tu renovación creativa semanal según la etapa de tu marca, escribime. Sin guion de venta, sin compromiso.</p>
+    <div class="keyword">ADS <span class="arrow">↩</span></div>
+    <p class="fine">Respondé <strong>ADS</strong> a la historia y arrancamos la conversación.</p>
+  </section>
+
+  <footer>
+    GENESIS OS — <span class="brand">Manu Domínguez</span><br>De depender de la suerte a un sistema que renueva solo.
+  </footer>
+
+  </div>
+
+<script>
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target);} });
+  },{threshold:.14});
+  document.querySelectorAll('.obs').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
