@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>El Playbook Operativo — Genesis OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0A08; --bg-2:#131110; --panel:#17140F; --panel-2:#1E1913;
+  --ink:#FAF7F0; --ink-dim:#A8A296; --ink-faint:#6E685C;
+  --accent:#FF6A1A; --accent-deep:#E2560A; --accent-soft:#FF9A54;
+  --line:#262019; --line-2:#37301F;
+  --display:'Bricolage Grotesque',Impact,sans-serif;
+  --body:'Hanken Grotesk',system-ui,sans-serif;
+  --mono:'Space Mono',monospace;
+  --col:900px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.7;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 92% 42% at 50% 0%, rgba(255,106,26,.11), transparent 62%)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.32;
+  background-image:linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse 120% 70% at 50% 0%, #000, transparent 72%)}
+
+/* ── NAV ── */
+.prog{position:fixed;top:0;left:0;right:0;height:3px;z-index:80}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent-deep),var(--accent));
+  box-shadow:0 0 14px rgba(255,106,26,.6)}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:70;padding:14px 28px;display:flex;
+  align-items:center;justify-content:space-between;
+  background:linear-gradient(180deg,rgba(11,10,8,.95),rgba(11,10,8,0));backdrop-filter:blur(9px);
+  opacity:0;transform:translateY(-12px);transition:.3s ease;pointer-events:none}
+.topbar.on{opacity:1;transform:none;pointer-events:auto}
+.brand{display:inline-flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;
+  font-size:16px;letter-spacing:-.02em}
+.brand .os{color:var(--accent);font-size:.62em;transform:translateY(2px)}
+.sun{width:1em;height:1em;border-radius:50%;flex:none;
+  background:radial-gradient(circle at 34% 30%,#FFC48A,#FF8A3D 42%,#FF6A1A 64%,#D8500A 100%);
+  box-shadow:0 0 15px rgba(255,106,26,.5)}
+.tocbtn{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  background:var(--panel);border:1px solid var(--line-2);color:var(--ink-dim);padding:8px 15px;
+  border-radius:8px;cursor:pointer;transition:.16s}
+.tocbtn:hover{border-color:var(--accent-deep);color:var(--accent)}
+.tocpanel{position:fixed;inset:0;z-index:90;background:rgba(11,10,8,.976);backdrop-filter:blur(16px);
+  display:none;overflow-y:auto;padding:76px 28px 60px}
+.tocpanel.on{display:block}
+.tocpanel .in{max-width:1160px;margin:0 auto}
+.tocpanel h4{font-family:var(--mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:24px}
+.tocgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:6px}
+.tocgrid a{display:grid;grid-template-columns:32px 1fr;gap:11px;padding:9px 13px;border-radius:8px;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink-dim);text-decoration:none;
+  font-size:14px;transition:.15s;align-items:baseline}
+.tocgrid a:hover{border-color:var(--accent-deep);color:var(--ink);background:rgba(255,106,26,.06)}
+.tocgrid a span{font-family:var(--mono);font-size:10.5px;color:var(--accent);font-weight:700}
+.tocgrid .h{grid-column:1/-1;font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent-deep);margin-top:18px;padding-left:2px}
+.tocclose{position:fixed;top:18px;right:24px;z-index:95;background:var(--panel);border:1px solid var(--line-2);
+  color:var(--ink-dim);width:36px;height:36px;border-radius:9px;cursor:pointer;font-family:var(--mono);display:none}
+.tocpanel.on ~ .tocclose{display:block}
+
+/* ── PORTADA ── */
+.cover{position:relative;z-index:2;min-height:100svh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:80px 28px 60px;overflow:hidden}
+.cover::before{content:"";position:absolute;left:50%;top:-8%;width:min(108vmin,1140px);height:min(108vmin,1140px);
+  transform:translateX(-50%);pointer-events:none;
+  background:radial-gradient(circle at 50% 46%, rgba(255,176,100,.34) 0%, rgba(255,106,26,.17) 33%, rgba(255,106,26,.05) 55%, transparent 68%);
+  animation:dawn 1.5s cubic-bezier(.2,.7,.2,1) both}
+@keyframes dawn{from{opacity:0;transform:translate(-50%,6vmin)}to{opacity:1;transform:translate(-50%,0)}}
+.cover>*{position:relative;z-index:3}
+.brandrow{display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:800;
+  font-size:clamp(19px,2.2vw,26px);letter-spacing:-.02em;opacity:.92;margin-bottom:28px}
+.brandrow .os{color:var(--accent);font-size:.62em;transform:translateY(3px)}
+.badge{display:inline-flex;align-items:center;gap:13px;font-family:var(--mono);font-weight:700;
+  font-size:clamp(11px,1.3vw,15px);letter-spacing:.3em;text-transform:uppercase;color:#0B0A08;
+  background:var(--accent);padding:11px 25px 11px 28px;border-radius:100px;
+  box-shadow:0 16px 52px rgba(255,106,26,.35);margin-bottom:12px}
+.badge .dot{width:8px;height:8px;border-radius:50%;background:#0B0A08;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+.stack{position:relative;width:min(94vw,900px);height:min(48vw,430px);margin:26px 0 8px}
+.covtitle{font-family:var(--display);font-weight:800;font-size:clamp(44px,8.4vw,112px);line-height:.9;
+  letter-spacing:-.04em;margin-top:14px}
+.covtitle .hl{color:var(--accent)}
+.covsub{font-family:var(--display);font-weight:700;font-size:clamp(19px,3vw,38px);line-height:1.12;
+  letter-spacing:-.02em;max-width:20ch;margin:20px auto 0}
+.covsub .hl{color:var(--accent)}
+.covdeck{color:var(--ink-dim);font-size:clamp(15px,1.7vw,20px);line-height:1.55;max-width:670px;margin:22px auto 0}
+.covdeck b{color:var(--ink);font-weight:600}
+.chips{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-top:28px}
+.chip{font-family:var(--mono);font-size:clamp(10px,1.02vw,12.5px);letter-spacing:.13em;text-transform:uppercase;
+  border:1px solid var(--line-2);border-radius:100px;padding:8px 17px;color:var(--ink-faint);white-space:nowrap}
+.chip.hot{border-color:var(--accent-deep);color:var(--accent);background:rgba(255,106,26,.08)}
+.scrollcue{margin-top:38px;font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:11px}
+.scrollcue i{display:block;width:1px;height:38px;background:linear-gradient(180deg,var(--accent),transparent);
+  animation:drop 1.9s ease-in-out infinite}
+@keyframes drop{0%,100%{opacity:.3;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+
+/* modo captura */
+body.cap{overflow:hidden;background:#050505}
+body.cap .doc,body.cap .topbar,body.cap .prog,body.cap footer,body.cap .scrollcue{display:none!important}
+body.cap .cover{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:1080px;height:1350px;
+  min-height:0;border:1px solid #222;padding:70px 64px}
+body.cap.c916 .cover{width:1080px;height:1920px;padding:200px 64px}
+.caphint{position:fixed;bottom:13px;left:50%;transform:translateX(-50%);z-index:99;display:none;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+body.cap .caphint{display:block}
+
+/* ── STACK DE PAGINAS ── */
+.pg{position:absolute;background:linear-gradient(168deg,#1A1611,#121009 62%);border:1px solid var(--line-2);
+  border-radius:9px;overflow:hidden;text-align:left;
+  box-shadow:0 34px 74px rgba(0,0,0,.72), 0 3px 0 rgba(255,255,255,.03) inset}
+.pg.front{box-shadow:0 46px 96px rgba(0,0,0,.82), 0 0 0 1px rgba(255,106,26,.16), 0 0 100px rgba(255,106,26,.11)}
+.pgin{padding:25px 23px;height:100%;display:flex;flex-direction:column}
+.pgtop{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);
+  padding-bottom:10px;margin-bottom:14px}
+.pgtop .l{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-deep)}
+.pgtop .r{font-family:var(--mono);font-size:8px;color:var(--ink-faint)}
+.pgh{font-family:var(--display);font-weight:800;font-size:18px;line-height:1.05;letter-spacing:-.02em;margin-bottom:5px}
+.pgh .hl{color:var(--accent)}
+.pgsub{font-size:9px;color:var(--ink-faint);line-height:1.4;margin-bottom:13px}
+.pgfoot{margin-top:auto;padding-top:10px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:7.5px;color:var(--ink-faint);letter-spacing:.1em}
+.pgfoot b{color:var(--accent-deep)}
+.mrow{display:grid;grid-template-columns:15px 1fr;gap:7px;align-items:center;padding:5px 0;
+  border-top:1px solid rgba(38,32,25,.8);font-size:9.5px;color:var(--ink-dim);line-height:1.3}
+.mrow:first-of-type{border-top:none}
+.mrow .mn{font-family:var(--mono);font-size:8.5px;font-weight:700;color:var(--accent)}
+.mrow b{color:var(--ink);font-weight:600}
+.mbox{border:1px solid var(--line-2);border-radius:6px;padding:8px 9px;background:rgba(11,10,8,.55);
+  font-size:9px;color:var(--ink-dim);line-height:1.42}
+.mbox b{color:var(--ink)}
+.mbox .k{font-family:var(--mono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent-deep);display:block;margin-bottom:4px}
+.mflow{display:flex;gap:3px;margin:2px 0 11px}
+.mflow .s{flex:1;border:1px solid var(--line-2);border-radius:5px;padding:6px 2px;text-align:center;
+  font-size:8px;color:var(--ink);background:rgba(11,10,8,.5);font-weight:600}
+.mflow .s .t{font-family:var(--mono);font-size:6.5px;color:var(--accent-deep);display:block;margin-bottom:2px}
+.mflow .a{display:flex;align-items:center;color:var(--ink-faint);font-size:8px}
+.mtbl{width:100%;border-collapse:collapse;border:1px solid var(--line-2);border-radius:6px;overflow:hidden}
+.mtbl th{font-family:var(--mono);font-size:7px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);
+  text-align:left;padding:5px 6px;background:rgba(11,10,8,.6);font-weight:400}
+.mtbl td{padding:5px 6px;border-top:1px solid var(--line);font-size:8.5px;color:var(--ink-dim)}
+.mtbl td.v{font-family:var(--mono);color:var(--accent);text-align:right;font-weight:700;font-size:8px}
+.mstat .v{font-family:var(--display);font-weight:800;color:var(--accent);line-height:1}
+.mstat .k{font-family:var(--mono);font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-top:4px}
+.mgrid5{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:10px}
+.mgrid5 .c{border:1px solid var(--line-2);border-radius:5px;padding:6px 2px;text-align:center;background:rgba(11,10,8,.5)}
+.mgrid5 .c .n{font-family:var(--mono);font-size:7.5px;color:var(--accent);font-weight:700}
+.mgrid5 .c .d{font-size:6.5px;color:var(--ink-faint);margin-top:2px}
+.pagebadge{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--accent);color:#0B0A08;border-radius:50%;box-shadow:0 14px 40px rgba(255,106,26,.42);
+  z-index:9;transform:rotate(-9deg)}
+.pagebadge .n{font-family:var(--display);font-weight:800;line-height:.9}
+.pagebadge .l{font-family:var(--mono);letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+
+/* ── DOC ── */
+.doc{position:relative;z-index:2;max-width:var(--col);margin:0 auto;padding:0 28px 110px}
+.part{margin:120px 0 54px;padding-top:50px;border-top:1px solid var(--line-2)}
+.part:first-of-type{margin-top:86px}
+.partno{font-family:var(--display);font-weight:800;font-size:clamp(62px,11vw,116px);line-height:.8;
+  color:transparent;-webkit-text-stroke:2px var(--line-2);letter-spacing:-.04em;margin-bottom:14px}
+.partk{font-family:var(--mono);font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);
+  display:flex;align-items:center;gap:13px;margin-bottom:13px}
+.partk::before{content:"";width:30px;height:1px;background:var(--accent)}
+.part h2{font-family:var(--display);font-weight:800;font-size:clamp(32px,4.9vw,52px);line-height:1.03;
+  letter-spacing:-.026em}
+.part h2 .hl{color:var(--accent)}
+.part .pd{color:var(--ink-dim);font-size:18.5px;margin-top:15px;max-width:62ch}
+
+.sec{margin:66px 0}
+.secno{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--accent-deep);
+  text-transform:uppercase;margin-bottom:10px}
+.sec h3{font-family:var(--display);font-weight:800;font-size:clamp(25px,3.5vw,37px);line-height:1.1;
+  letter-spacing:-.02em;margin-bottom:18px}
+.sec h3 .hl{color:var(--accent)}
+.sec h4{font-family:var(--display);font-weight:700;font-size:20.5px;letter-spacing:-.01em;margin:32px 0 11px}
+.sec h4 .n{color:var(--accent);font-family:var(--mono);font-size:.72em;margin-right:9px}
+.sec h5{font-family:var(--display);font-weight:700;font-size:17.5px;margin:22px 0 8px;color:var(--accent-soft)}
+p{font-size:17.5px;color:var(--ink-dim);margin-bottom:16px}
+p strong{color:var(--ink);font-weight:600}
+p em{color:var(--accent-soft);font-style:normal}
+code{font-family:var(--mono);font-size:.88em;color:var(--accent);background:var(--bg-2);
+  padding:2px 6px;border-radius:4px;border:1px solid var(--line)}
+.faint{color:var(--ink-faint)}
+.dim{color:var(--ink-dim)}
+.acc{color:var(--accent)}
+
+ul.li{list-style:none;margin:0 0 18px;display:grid;gap:10px}
+ul.li li{display:grid;grid-template-columns:auto 1fr;gap:12px;font-size:17px;color:var(--ink-dim);
+  line-height:1.55;align-items:start}
+ul.li li::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--accent-deep);
+  margin-top:10px;flex:none}
+ul.li li strong{color:var(--ink);font-weight:600}
+ol.num{list-style:none;counter-reset:n;margin:0 0 18px;display:grid;gap:12px}
+ol.num li{counter-increment:n;display:grid;grid-template-columns:auto 1fr;gap:14px;font-size:17px;
+  color:var(--ink-dim);line-height:1.55}
+ol.num li::before{content:counter(n,decimal-leading-zero);font-family:var(--mono);font-size:12.5px;
+  font-weight:700;color:var(--accent);padding-top:3px}
+ol.num li strong{color:var(--ink);font-weight:600}
+
+.box{border:1px solid var(--line-2);border-radius:14px;padding:23px 25px;background:var(--panel);margin:24px 0}
+.box .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:10px}
+.box p:last-child,.box ul:last-child,.box ol:last-child,.box table:last-child{margin-bottom:0}
+.box.warn{border-color:var(--accent-deep);background:linear-gradient(180deg,rgba(255,106,26,.07),var(--panel))}
+.box.dark{background:var(--bg-2)}
+.rule{font-family:var(--mono);font-size:15.5px;line-height:1.55;color:var(--ink);background:var(--bg-2);
+  border:1px dashed var(--line-2);border-radius:12px;padding:18px 21px;margin:24px 0}
+.rule b{color:var(--accent)}
+.quote{font-family:var(--display);font-weight:700;font-size:clamp(21px,2.8vw,29px);line-height:1.22;
+  letter-spacing:-.012em;border-left:3px solid var(--accent);padding-left:24px;margin:32px 0}
+.quote .hl{color:var(--accent)}
+
+table.t{width:100%;border-collapse:collapse;margin:24px 0;border:1px solid var(--line-2);
+  border-radius:12px;overflow:hidden;font-size:15.5px}
+table.t th{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-faint);text-align:left;padding:12px 15px;background:var(--bg-2);
+  border-bottom:1px solid var(--line-2);font-weight:400}
+table.t th.hi{color:var(--accent)}
+table.t td{padding:12px 15px;border-top:1px solid var(--line);color:var(--ink-dim);background:var(--panel);
+  vertical-align:top}
+table.t td strong{color:var(--ink);font-weight:600}
+table.t td.v{font-family:var(--mono);color:var(--accent);font-weight:700;text-align:right;white-space:nowrap}
+table.t td.no{color:var(--accent-soft)}
+table.t tr.tot td{background:var(--panel-2);border-top:1px solid var(--line-2)}
+table.t tr.tot td.v{font-size:18px}
+
+.cards{display:grid;gap:13px;margin:24px 0}
+.c2{grid-template-columns:repeat(2,1fr)}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.card{border:1px solid var(--line);border-radius:13px;padding:20px;background:var(--panel)}
+.card.lit{border-color:var(--accent-deep);background:linear-gradient(180deg,rgba(255,106,26,.06),var(--panel))}
+.card .k{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:8px}
+.card.lit .k{color:var(--accent)}
+.card h5{font-family:var(--display);font-weight:700;font-size:18.5px;letter-spacing:-.01em;margin:0 0 7px;color:var(--ink)}
+.card p{font-size:15px;margin:0;line-height:1.5}
+
+.flow{display:flex;gap:7px;flex-wrap:wrap;margin:24px 0}
+.flow .s{flex:1;min-width:112px;border:1px solid var(--line-2);border-radius:11px;padding:14px 10px;
+  background:var(--panel);text-align:center}
+.flow .s.lit{border-color:var(--accent-deep);background:linear-gradient(180deg,rgba(255,106,26,.09),var(--panel))}
+.flow .s .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--accent-deep);margin-bottom:5px}
+.flow .s .n{font-size:15px;font-weight:600;color:var(--ink);line-height:1.25}
+.flow .s.ghost{opacity:.45;border-style:dashed}
+.flow .a{display:flex;align-items:center;color:var(--ink-faint);font-family:var(--mono);font-size:16px}
+
+.chain{display:grid;gap:6px;margin:24px 0}
+.step{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:center;padding:12px 16px;
+  border:1px solid var(--line);border-radius:11px;background:var(--panel);font-size:16px;color:var(--ink-dim)}
+.step .sn{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent-deep)}
+.step strong{color:var(--ink);font-weight:600}
+.step.hot{border-color:var(--accent-deep);background:linear-gradient(90deg,rgba(255,106,26,.09),var(--panel) 62%)}
+.step.hot .sn,.step.hot strong{color:var(--accent)}
+
+.stats{display:grid;gap:13px;margin:24px 0}
+.stat{border:1px solid var(--line-2);border-radius:13px;padding:19px;background:var(--panel);text-align:center}
+.stat .v{font-family:var(--display);font-weight:800;font-size:34px;line-height:1;color:var(--accent);letter-spacing:-.02em}
+.stat .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-faint);margin-top:8px;line-height:1.4}
+
+.yn{display:flex;gap:10px;align-items:flex-start;font-size:16px;line-height:1.5;margin-top:10px}
+.yn::before{font-family:var(--mono);font-weight:700;flex:none;font-size:12.5px;padding-top:3px}
+.yn.no{color:var(--accent-soft)}.yn.no::before{content:"NO"}
+.yn.si{color:var(--ink-dim)}.yn.si::before{content:"SÍ";color:var(--accent)}
+.yn strong{color:var(--ink);font-weight:600}
+
+.check{display:grid;gap:8px;margin:24px 0}
+.check div{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:11px 15px;border:1px solid var(--line);
+  border-radius:10px;background:var(--panel);font-size:16px;color:var(--ink-dim);align-items:start}
+.check div::before{content:"";width:16px;height:16px;border:1px solid var(--line-2);border-radius:4px;
+  margin-top:4px;flex:none}
+.check div strong{color:var(--ink);font-weight:600}
+
+footer{position:relative;z-index:2;text-align:center;padding:70px 28px 60px;border-top:1px solid var(--line-2);
+  max-width:var(--col);margin:70px auto 0}
+footer p{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);margin:18px 0 0}
+
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto}}
+@media(max-width:820px){
+  .c2,.c3,.c4{grid-template-columns:1fr}
+  .stack{height:62vw}
+  p,ul.li li,ol.num li{font-size:16.5px}
+  table.t{font-size:14px}
+  table.t th,table.t td{padding:10px 11px}
+  .flow .s{min-width:100%}
+  .flow .a{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="prog"><i id="pbar"></i></div>
+<div class="topbar" id="topbar">
+  <span class="brand"><span class="sun"></span>Genesis<span class="os">OS</span></span>
+  <button class="tocbtn" onclick="toc()">Índice</button>
+</div>
+<div class="tocpanel" id="tocpanel"><div class="in"><h4>Contenido del playbook</h4><div class="tocgrid" id="tocgrid"></div></div></div>
+<button class="tocclose" onclick="toc()">✕</button>
+<div class="caphint">C · formato &nbsp;·&nbsp; Esc · salir</div>
+
+<header class="cover" id="top">
+  <div class="brandrow"><span class="sun"></span>Genesis<span class="os">OS</span></div>
+  <div class="badge"><span class="dot"></span>Playbook completo · 50 páginas</div>
+  <div class="stack" id="stack"></div>
+  <h1 class="covtitle">El Playbook<br><span class="hl">Operativo</span></h1>
+  <p class="covsub">Los sistemas, procesos y operaciones para escalar tu marca a <span class="hl">+100M/mes</span></p>
+  <p class="covdeck">Todo lo que hay debajo de una marca que factura en serio. <b>Estable, escalable y largoplacista.</b></p>
+  <div class="chips">
+    <span class="chip hot">50 páginas</span>
+    <span class="chip">9 partes</span>
+    <span class="chip">Plantillas y checklists</span>
+    <span class="chip">E-commerce Argentina</span>
+  </div>
+  <div class="scrollcue"><i></i>Deslizá para empezar</div>
+</header>
+
+<main class="doc" id="doc">
+
+<!-- ══════ PARTE 0 ══════ -->
+<section class="part" id="p0" data-part="Antes de empezar">
+  <div class="partno">00</div>
+  <div class="partk">Antes de empezar</div>
+  <h2>Por qué este documento existe</h2>
+  <p class="pd">Casi todo el contenido de e-commerce que circula es sobre tácticas. Este playbook es sobre lo otro: la estructura que hace que las tácticas sirvan de algo.</p>
+</section>
+
+<section class="sec" id="s01" data-t="La diferencia entre una racha y un negocio">
+  <div class="secno">01</div>
+  <h3>La diferencia entre una racha y <span class="hl">un negocio</span></h3>
+  <p>Hay dos formas de hacer plata con e-commerce. La primera es acertarle: encontrás un producto, pegás un creativo, escalás dos meses y después se muere. La segunda es construir una estructura donde cada parte alimenta a la siguiente, y donde perder un ganador es un martes cualquiera en vez de una crisis.</p>
+  <p>La primera es una racha. La segunda es un negocio. <strong>Y la diferencia entre las dos no es el talento: es la cantidad de sistemas que tenés montados.</strong></p>
+  <div class="quote">Ya no se gana por encontrar el producto.<br><span class="hl">Se gana por el sistema con el que lo vendés.</span></div>
+  <p>Este playbook es el mapa completo de esos sistemas. No es motivacional, no tiene relleno, y no asume que ya sabés nada. Va desde los principios hasta la operación diaria, en el orden real en que hay que resolverlos.</p>
+</section>
+
+<section class="sec" id="s02" data-t="Cómo está organizado y cómo leerlo">
+  <div class="secno">02</div>
+  <h3>Cómo está organizado</h3>
+  <p>Nueve partes. Las tres primeras son fundaciones, las tres del medio son la máquina de vender, y las tres últimas son escalado y operación. <strong>El orden no es decorativo: cada parte asume la anterior resuelta.</strong></p>
+  <table class="t">
+    <tr><th>Parte</th><th>Qué resuelve</th><th class="hi">Sin esto…</th></tr>
+    <tr><td><strong>01 · Principios</strong></td><td>Cómo funciona el negocio de verdad</td><td>Optimizás lo que no importa</td></tr>
+    <tr><td><strong>02 · Producto y validación</strong></td><td>Qué vender y cómo saberlo antes de gastar</td><td>Quemás plata probando a ciegas</td></tr>
+    <tr><td><strong>03 · Números y oferta</strong></td><td>Costeo real, pricing, márgenes</td><td>Escalás a pérdida sin enterarte</td></tr>
+    <tr><td><strong>04 · Marca</strong></td><td>Identidad, posicionamiento, confianza</td><td>Competís por precio y perdés</td></tr>
+    <tr><td><strong>05 · Tienda y funnel</strong></td><td>La conversión del tráfico que traés</td><td>Pagás por visitas que no compran</td></tr>
+    <tr><td><strong>06 · Creativos y ads</strong></td><td>El motor de adquisición</td><td>Dependés de la suerte de un winner</td></tr>
+    <tr><td><strong>07 · Retención y LTV</strong></td><td>Que el cliente vuelva sin costo nuevo</td><td>Vivís de comprar clientes nuevos</td></tr>
+    <tr><td><strong>08 · Operación y finanzas</strong></td><td>Stock, proveedores, cash flow</td><td>El negocio muere con ventas récord</td></tr>
+    <tr><td><strong>09 · Equipo y sistema</strong></td><td>Delegación, procesos, rutina</td><td>Sos el cuello de botella para siempre</td></tr>
+  </table>
+  <div class="rule">Si tenés poco tiempo: leé la <b>Parte 01</b>, la <b>Parte 03</b> y la <b>Parte 08</b>. Son las tres que más marcas matan.</div>
+</section>
+
+<!-- ══════ PARTE 1 — PRINCIPIOS ══════ -->
+<section class="part" id="p1" data-part="Principios">
+  <div class="partno">01</div>
+  <div class="partk">Parte 1</div>
+  <h2>Los principios que <span class="hl">no cambian</span></h2>
+  <p class="pd">Antes de cualquier táctica, cuatro cosas tienen que estar claras. Si estas cuatro no están, todo lo demás son parches sobre una estructura que no cierra.</p>
+</section>
+
+<section class="sec" id="s03" data-t="El e-commerce es un sistema secuencial">
+  <div class="secno">03</div>
+  <h3>El e-commerce es un <span class="hl">sistema secuencial</span></h3>
+  <p>Un cliente no compra un producto: recorre un sistema. Y cada eslabón depende del anterior.</p>
+  <div class="flow">
+    <div class="s lit"><div class="t">1</div><div class="n">Marketing<br><span style="font-weight:400;color:var(--ink-faint);font-size:.85em">concientiza</span></div></div>
+    <div class="a">→</div>
+    <div class="s lit"><div class="t">2</div><div class="n">Tienda<br><span style="font-weight:400;color:var(--ink-faint);font-size:.85em">convierte</span></div></div>
+    <div class="a">→</div>
+    <div class="s lit"><div class="t">3</div><div class="n">Operación<br><span style="font-weight:400;color:var(--ink-faint);font-size:.85em">entrega</span></div></div>
+    <div class="a">→</div>
+    <div class="s lit"><div class="t">4</div><div class="n">Post-venta<br><span style="font-weight:400;color:var(--ink-faint);font-size:.85em">retiene</span></div></div>
+  </div>
+  <p>Esto explica por qué tantos diagnósticos son equivocados. Alguien dice "no me funcionan los ads" y en realidad el problema está en la tienda. Otro dice "mi tienda no convierte" y el problema es que el producto no le resuelve nada urgente a nadie. <strong>El síntoma casi nunca aparece donde está la causa.</strong></p>
+  <h4><span class="n">→</span> El mapa del funnel</h4>
+  <table class="t">
+    <tr><th>Etapa</th><th>Quién está ahí</th><th class="hi">Qué mensaje necesita</th></tr>
+    <tr><td><strong>TOFU</strong></td><td>Mucha gente, poca conciencia</td><td>Concientizar del problema, educar sobre la solución</td></tr>
+    <tr><td><strong>MOFU</strong></td><td>Menos gente, más conciencia</td><td>Presentar el producto, el mecanismo único, conectar con el dolor</td></tr>
+    <tr><td><strong>BOFU</strong></td><td>Poca gente, alta intención</td><td>Urgencia, escasez, oferta, beneficios, garantías</td></tr>
+  </table>
+  <p>Poca gente compra porque el proceso de concientización es largo y en cada etapa se pierde gente. Ese filtro es natural. <strong>Lo que separa un e-commerce rentable de uno que pierde plata es cuántos sobreviven a cada etapa</strong> — y eso depende de la calidad del marketing, de la tienda y de la operación de fondo.</p>
+</section>
+
+<section class="sec" id="s04" data-t="Los 7 puntos donde se rompe la cadena">
+  <div class="secno">04</div>
+  <h3>Los <span class="hl">7 puntos</span> donde se rompe la cadena</h3>
+  <p>Prácticamente todas las marcas que fracasan se rompen en uno de estos siete lugares. Cada uno tiene su parte en este playbook.</p>
+  <table class="t">
+    <tr><th>#</th><th>Falla</th><th class="hi">Síntoma con el que se presenta</th></tr>
+    <tr><td class="v">01</td><td class="no"><strong>Producto genérico</strong></td><td>Competís solo por precio y el margen no alcanza</td></tr>
+    <tr><td class="v">02</td><td class="no"><strong>Falta de investigación</strong></td><td>El copy sale genérico y el CPA se dispara</td></tr>
+    <tr><td class="v">03</td><td class="no"><strong>Tienda que no convierte</strong></td><td>Buen CTR, ventas bajas. Pagás visitas que no compran</td></tr>
+    <tr><td class="v">04</td><td class="no"><strong>Sin email marketing</strong></td><td>El 90% que entra y no compra se pierde para siempre</td></tr>
+    <tr><td class="v">05</td><td class="no"><strong>No trackear finanzas</strong></td><td>Creés que ganás y estás en pérdida. Te enterás tarde</td></tr>
+    <tr><td class="v">06</td><td class="no"><strong>Proveedor inestable</strong></td><td>Te quedás sin stock y se frena la bola de nieve</td></tr>
+    <tr><td class="v">07</td><td class="no"><strong>Cash flow mal gestionado</strong></td><td>Dos o tres días malos y el negocio muere con ventas</td></tr>
+  </table>
+  <div class="box warn">
+    <div class="k">La falla 7 merece atención especial</div>
+    <p>Las causas típicas: se paga todo en efectivo sin apalancamiento, la plata entra tarde y los pagos salen rápido, el dueño se saca plata cuando va bien, y no hay backup. <strong>La plata es el oxígeno del negocio. Sin oxígeno el negocio muere, aunque las ventas estén funcionando.</strong></p>
+  </div>
+</section>
+
+<section class="sec" id="s05" data-t="La jerarquía de apalancamiento">
+  <div class="secno">05</div>
+  <h3>La jerarquía de <span class="hl">apalancamiento</span></h3>
+  <p>No todas las palancas mueven lo mismo. Esta es la escala real, de la que más mueve a la que menos. Casi toda la industria trabaja de abajo hacia arriba.</p>
+  <table class="t">
+    <tr><th>Nivel</th><th>Palanca</th><th class="hi">Impacto</th></tr>
+    <tr><td class="v">01</td><td><strong>El producto y la oferta</strong></td><td>Brutal. Una buena oferta salva un creativo mediocre</td></tr>
+    <tr><td class="v">02</td><td><strong>El ángulo</strong> — qué dolor tocás y a quién</td><td>Muy alto. Define si te escuchan o te saltean</td></tr>
+    <tr><td class="v">03</td><td><strong>El hook</strong> — los primeros 3 segundos</td><td>El 80% del rendimiento del anuncio</td></tr>
+    <tr><td class="v">04</td><td><strong>La landing</strong> — congruencia con el ángulo</td><td>Alto. Entre 30 y 50% de las ventas se define acá</td></tr>
+    <tr><td class="v">05</td><td><strong>El concepto y el formato</strong></td><td>Medio. Multiplica lo que ya funciona</td></tr>
+    <tr><td class="v">06</td><td><strong>La estructura de campaña</strong></td><td>El más bajo. Y el que más se discute</td></tr>
+  </table>
+  <div class="quote">Si tu oferta no cierra,<br><span class="hl">ninguna estructura de campaña te va a salvar.</span></div>
+  <p>Esto no significa que la estructura no importe. Significa que <strong>importa último</strong>. Cuando alguien pregunta "¿ABO o CBO?" antes de saber su CPA break-even, está optimizando el nivel 6 con el nivel 1 roto.</p>
+</section>
+
+<section class="sec" id="s06" data-t="Dónde está la plata de verdad">
+  <div class="secno">06</div>
+  <h3>Dónde está la plata <span class="hl">de verdad</span></h3>
+  <p>La primera compra tiene que ser rentable — el caso base es alrededor de <strong>25% de margen</strong>. Pero el crecimiento real de la marca no viene de ahí.</p>
+  <p>Viene del <strong>backing system</strong>: el ecosistema que hace que el cliente vuelva sin nuevo costo publicitario. Cada recompra puede más que duplicar el profit de la primera venta, porque el CPA ya está pagado.</p>
+  <div class="cards c3">
+    <div class="card"><div class="k">Primera compra</div><h5>Paga el CPA</h5><p>Cubre adquisición, producto, envío y logística. Deja ~25% si está bien costeada.</p></div>
+    <div class="card lit"><div class="k">Segunda compra</div><h5>Casi todo margen</h5><p>Sin CPA nuevo. Acá empieza el negocio de verdad.</p></div>
+    <div class="card lit"><div class="k">Tercera en adelante</div><h5>El activo</h5><p>Cada cliente retenido es facturación que ya no depende de la pauta.</p></div>
+  </div>
+  <div class="rule">Por eso el LTV es la métrica madre: <b>cuanto más LTV, más CPA podés pagar, más agresivo podés ser adquiriendo, y le ganás la subasta a tu competencia.</b></div>
+</section>
+
+<section class="sec" id="s07" data-t="El chip mental del founder">
+  <div class="secno">07</div>
+  <h3>El chip mental del founder</h3>
+  <p>Esto no es un capítulo de motivación, es una advertencia práctica: <strong>hay una forma de trabajar que tiene techo bajo, y casi todo el mundo empieza ahí.</strong></p>
+  <div class="cards c2">
+    <div class="card">
+      <div class="k">La forma que no escala</div>
+      <p style="font-size:16.5px">"Me levanto, armo una tienda rápido, creo anuncios, le meto 30 dólares, si no vende paso a otro producto." Traer marcas de afuera con el mismo nombre. Vender réplicas. Químicos sin certificación.</p>
+      <div class="yn no">Con eso no vas a llegar a ningún lado — y en el futuro te trae problemas</div>
+    </div>
+    <div class="card lit">
+      <div class="k">La forma que sí</div>
+      <p style="font-size:16.5px">Formalizar cómo trabajás. Construir la identidad de alguien que gestiona marcas, no de alguien que corre productos. Pensar en tres años, no en tres meses.</p>
+      <div class="yn si">Es lo único que permite construir <strong>riqueza real</strong> en vez de una racha</div>
+    </div>
+  </div>
+  <div class="box">
+    <div class="k">La regla de oro del dinero</div>
+    <p>No te pagues hasta que la marca genere cash flow real, y cuando lo hagas, que sea un mínimo que no le haga daño. <strong>Los primeros 3 a 12 meses: no tocar un peso de la marca.</strong> Cada peso que sale del negocio es un peso que no compra stock ni pauta.</p>
+  </div>
+</section>
+
+<!-- ══════ PARTE 2 — PRODUCTO ══════ -->
+<section class="part" id="p2" data-part="Producto y validación">
+  <div class="partno">02</div>
+  <div class="partk">Parte 2</div>
+  <h2>Producto y validación</h2>
+  <p class="pd">Cómo elegir qué vender y cómo saber si va a funcionar <strong>antes</strong> de gastar plata. Este es el punto donde se define el techo de todo lo demás.</p>
+</section>
+
+<section class="sec" id="s08" data-t="Los criterios de un producto que aguanta">
+  <div class="secno">08</div>
+  <h3>Los criterios de un producto <span class="hl">que aguanta</span></h3>
+  <p>No todos los productos pueden sostener una marca. Estos son los filtros, en orden de importancia.</p>
+
+  <h4><span class="n">01</span> Resuelve un problema real y específico</h4>
+  <p>Urgente, emocional o físico, para un grupo identificable. "Te sentís cansado" no es un dolor: es una categoría. <strong>Un dolor difuso da triggers de compra débiles, y con triggers débiles el funnel se cae.</strong></p>
+
+  <h4><span class="n">02</span> Mecanismo único y alto valor percibido</h4>
+  <p>Tiene que haber un <em>por qué funciona</em> claro y distinto: fórmula, diseño, tecnología, forma de uso, protocolo. Ese mecanismo se comunica como la gran razón por la que esto sí funciona y las demás soluciones no.</p>
+  <div class="rule">Sin mecanismo único <b>sos uno más</b>. Con mecanismo único podés construir una marca de autoridad en una categoría — y hacer el branding sobre ese mismo mecanismo.</div>
+  <p>El alto valor percibido se construye con transformación visible, packaging, presentación, naming y comunicación. <strong>Es lo que justifica un precio mayor</strong>, y el precio mayor es lo que te da margen para pagar CPA.</p>
+
+  <h4><span class="n">03</span> Markup suficiente</h4>
+  <p>El COGS total tiene que entrar cómodo dentro del precio de venta. Como referencia, <strong>el costo total no debería superar un tercio del precio</strong>. Si no da, no hay oferta que lo arregle después.</p>
+
+  <h4><span class="n">04</span> Potencial de recompra y ecosistema</h4>
+  <p>Lo ideal es que el producto héroe tenga recompra directa (consumible, reposición, desgaste) o al menos un ecosistema de complementarios. Pensá siempre en el <strong>siguiente paso lógico después de la primera compra</strong>: complementos que mejoren el resultado, productos de mantenimiento, packs.</p>
+  <div class="box">
+    <div class="k">Ejemplo de ecosistema</div>
+    <p>Si alguien compra tu creatina en polvo, probablemente también usa proteína. Ahí hay un segundo consumible que suma LTV sobre el mismo cliente ya adquirido. <strong>Cuanto más clara sea la ruta de productos, más LTV por cliente.</strong></p>
+  </div>
+
+  <h4><span class="n">05</span> Logística sana</h4>
+  <p>Liviano y poco voluminoso, sobre todo si hay recompra: el costo de envío se multiplica por cada pedido. Chequear siempre <strong>peso real contra peso volumétrico</strong> con el operador logístico. Y post-venta simple: instrucciones claras, uso intuitivo, FAQ que reduzcan tickets.</p>
+
+  <h4><span class="n">06</span> Proveedor escalable</h4>
+  <p>Que pueda abastecer volumen si el producto explota, no solo 50 unidades por semana. Tiempos de reposición claros, calidad constante (misma materia prima, mismo proceso) y condiciones de pago que mejoren con el volumen. <strong>Y siempre un segundo proveedor testeado o al menos investigado</strong>, porque si falla el A se cae el negocio.</p>
+</section>
+
+<section class="sec" id="s09" data-t="Documento A: el filtro GO / NO-GO">
+  <div class="secno">09</div>
+  <h3>Documento A: el filtro <span class="hl">GO / NO-GO</span></h3>
+  <p>Validar con data en vez de con plata. El Documento A es el filtro que decide si un producto entra o no, antes de que gastes un peso. Evalúa tres bloques.</p>
+  <div class="cards c3">
+    <div class="card lit"><div class="k">Bloque 1</div><h5>Market Fit</h5><p>Demanda real, competencia, saturación, diferenciación posible, fuerza del trigger de compra.</p></div>
+    <div class="card lit"><div class="k">Bloque 2</div><h5>Operaciones</h5><p>Proveedor, logística, dimensiones, lead time, capacidad de reposición, margen.</p></div>
+    <div class="card lit"><div class="k">Bloque 3</div><h5>Ecosistema y regulación</h5><p>Normativa aplicable, claims permitidos, certificaciones, productos complementarios.</p></div>
+  </div>
+  <p>Devuelve un score, un veredicto (<strong>GO</strong> / GO con flags / <strong>NO-GO</strong>) y, cuando es NO-GO, pivots concretos. Hay <strong>7 musts eliminatorios</strong>: se pasan todos o no pasa.</p>
+  <h4><span class="n">→</span> Flags que se pueden resolver vs. flags que matan</h4>
+  <table class="t">
+    <tr><th>Flag amarilla (resoluble)</th><th class="hi">Flag roja (estructural)</th></tr>
+    <tr><td>Decisión de proveedor pendiente — siempre se consigue, es operativo</td><td>Mercado saturado con marcas fuertes ya posicionadas</td></tr>
+    <tr><td>Diferenciador y ángulos por definir — es trabajo de marketing</td><td>Regulación que mata la propuesta de valor</td></tr>
+    <tr><td>Comunicación regulatoria de claims en publicidad</td><td>Dolor difuso y transformación lenta</td></tr>
+    <tr><td>Ajustes de packaging o presentación</td><td>Triggers de compra débiles</td></tr>
+  </table>
+  <div class="box warn">
+    <div class="k">El criterio de decisión final</div>
+    <p>Elegís <strong>un</strong> producto y avanzás. Los requisitos: resultado GO, pasa los 7 musts, flags amarillas todas resolubles, buen puntaje en los tres bloques, y <strong>coherencia con tu capacidad operativa real</strong> — proveedor, capital y conocimiento del nicho.</p>
+  </div>
+  <div class="rule">Lo que sin sistema son <b>6 a 8 horas de research por producto</b>, con el filtro bien armado son minutos. Eso te permite evaluar 20 productos en vez de enamorarte del primero.</div>
+</section>
+
+<section class="sec" id="s10" data-t="Documento B: la investigación que sostiene todo">
+  <div class="secno">10</div>
+  <h3>Documento B: la investigación <span class="hl">que sostiene todo</span></h3>
+  <p>Con el producto elegido viene la investigación profunda. Este documento es literalmente la fundación del negocio: de acá sale el copy de los anuncios, el de la landing, los emails, el posicionamiento y el pricing.</p>
+  <h4><span class="n">→</span> Qué es VOCC y por qué importa tanto</h4>
+  <p>VOCC son las <strong>voces literales del cliente</strong>: frases textuales de reseñas, comentarios, foros y testimonios. Son oro puro para el copy porque el cliente ya escribió lo que le duele y lo que desea. Solo hay que recolectarlo, agruparlo y usarlo.</p>
+  <p>Las fuentes: Mercado Libre, Amazon, Reddit, TikTok, Instagram, foros. Se baja volumen —<strong>120 o más frases</strong>— y se filtra a las mejores. Las reseñas malas son especialmente valiosas: <strong>ahí están las objeciones.</strong></p>
+  <div class="box">
+    <div class="k">Truco de research</div>
+    <p>Arrancá buscando afuera (mercado americano, que tiene mucho más volumen de reseñas) y después localizá a Argentina. Los dolores son casi siempre los mismos; lo que cambia es el vocabulario y el contexto.</p>
+  </div>
+  <h4><span class="n">→</span> Las 10 secciones del documento</h4>
+  <ol class="num">
+    <li><strong>Síntesis inicial</strong> — el resumen ejecutivo del mercado</li>
+    <li><strong>VOCC clusterizadas</strong> — las frases agrupadas por frecuencia, que es lo que revela qué duele de verdad</li>
+    <li><strong>Cadena de consecuencias</strong> — a qué lleva el problema si no se resuelve. Es lo que activa el trigger emocional y justifica el precio</li>
+    <li><strong>Objeciones</strong> — todo lo que frena la compra, extraído de reseñas negativas</li>
+    <li><strong>Avatares / buyer personas</strong> — perfiles con sus dolores específicos</li>
+    <li><strong>Niveles de conciencia</strong> — dónde está cada segmento del mercado</li>
+    <li><strong>Ángulos de comunicación</strong> — cada dolor convertido en un ángulo de venta</li>
+    <li><strong>Inventario de prueba</strong> — qué evidencia tenés o necesitás conseguir</li>
+    <li><strong>Competencia y gaps</strong> — dónde hay espacio para posicionarse</li>
+    <li><strong>Pricing de referencia</strong> — cómo está el mercado</li>
+  </ol>
+  <h4><span class="n">→</span> Avatares y ángulos: la combinación que produce creativos</h4>
+  <p>Un mismo producto puede tener tres avatares completamente distintos, cada uno con sus dolores. Y dentro de cada avatar hay varios dolores, y <strong>cada dolor es un ángulo distinto.</strong></p>
+  <table class="t">
+    <tr><th>Avatar</th><th class="hi">Perfil y dolores</th></tr>
+    <tr><td><strong>Avatar 1</strong></td><td>Mujer menor de 30, con problemas específicos de su etapa de vida</td></tr>
+    <tr><td><strong>Avatar 2</strong></td><td>Mujer de 40 a 50, pre o post menopausia. Libido baja, poca energía, insomnio</td></tr>
+    <tr><td><strong>Avatar 3</strong></td><td>Otro perfil del mismo mercado, con sus propios dolores característicos</td></tr>
+  </table>
+  <p>Y para un producto como una crema, los ángulos podrían ser <strong>celulitis</strong>, <strong>arrugas</strong>, <strong>estrías</strong>. Y dentro de estrías: <em>post-embarazo</em>, <em>por crecimiento adolescente</em>, <em>por subida de peso</em>. Cada uno es un anuncio distinto, con una landing distinta, para una persona distinta.</p>
+  <div class="rule"><b>Avatar × ángulo = matriz de creativos.</b> De ahí salen los formatos: UGC, unboxing, antes/después. Sin esta matriz, producís al azar.</div>
+  <div class="box warn">
+    <div class="k">Por qué esto no es opcional</div>
+    <p>Sin esta investigación, <strong>los anuncios salen genéricos, el costo de adquisición se dispara y el negocio va a pérdida</strong> sin que entiendas por qué. Con la investigación bien hecha, cada decisión posterior tiene fundamento.</p>
+  </div>
+</section>
+
+<section class="sec" id="s11" data-t="Los 5 niveles de conciencia">
+  <div class="secno">11</div>
+  <h3>Los 5 niveles de <span class="hl">conciencia</span></h3>
+  <p>La misma persona necesita mensajes completamente distintos según cuánto sepa. Esta matriz decide qué le decís y a dónde lo mandás.</p>
+  <table class="t">
+    <tr><th>Nivel</th><th>Qué sabe</th><th class="hi">Qué necesita</th></tr>
+    <tr><td><strong>1 · Inconsciente</strong></td><td>No sabe que tiene el problema</td><td>Educación y agitación. Advertorial, contenido nativo</td></tr>
+    <tr><td><strong>2 · Del problema</strong></td><td>Le duele, no sabe que hay solución</td><td>Nombrar el dolor con sus palabras. Problema-solución</td></tr>
+    <tr><td><strong>3 · De la solución</strong></td><td>Sabe que existe la categoría</td><td>Por qué esta categoría. El mecanismo único</td></tr>
+    <tr><td><strong>4 · Del producto</strong></td><td>Conoce tu marca, no compró</td><td>Diferencial, prueba, reversión de riesgo</td></tr>
+    <tr><td><strong>5 · Totalmente consciente</strong></td><td>Está decidido</td><td>Oferta y urgencia. Nada más</td></tr>
+  </table>
+  <p>Como referencia de distribución de presupuesto entre etapas, un reparto de trabajo razonable es <strong>~15% arriba del funnel, ~45% en el medio y ~40% abajo</strong>, ajustando según lo que devuelva tu propia data.</p>
+  <div class="rule">Un anuncio de nivel 5 mostrado a alguien de nivel 1 <b>no convierte y encima quema audiencia</b>. Uno de nivel 1 mostrado a alguien de nivel 5 lo aburre y lo pierde.</div>
+</section>
+
+<!-- ══════ PARTE 3 — NÚMEROS Y OFERTA ══════ -->
+<section class="part" id="p3" data-part="Números y oferta">
+  <div class="partno">03</div>
+  <div class="partk">Parte 3</div>
+  <h2>Números y oferta</h2>
+  <p class="pd">La parte que casi nadie hace bien y la que decide si el negocio es viable. Si esta sección no está resuelta, todo lo que viene después se ejecuta a ciegas.</p>
+</section>
+
+<section class="sec" id="s12" data-t="El costeo real, línea por línea">
+  <div class="secno">12</div>
+  <h3>El costeo real, <span class="hl">línea por línea</span></h3>
+  <p>Tomá tu precio de venta y restale todo. Todo de verdad, no lo que te acordás. Este es el ejemplo completo de un producto de $70.000.</p>
+  <table class="t">
+    <tr><th>Concepto</th><th style="text-align:right">Monto</th></tr>
+    <tr><td><strong>Precio de venta</strong></td><td class="v">$70.000</td></tr>
+    <tr><td>Comisión de cuotas + pasarela <span class="faint">(~14%)</span></td><td class="v">— $9.800</td></tr>
+    <tr><td>Ingresos Brutos <span class="faint">(~4%)</span></td><td class="v">— $2.800</td></tr>
+    <tr><td>Costo de producto</td><td class="v">— $10.000</td></tr>
+    <tr><td>Envío</td><td class="v">— $6.500</td></tr>
+    <tr><td>Logística <span class="faint">(bolsa, empaque, despacho)</span></td><td class="v">— $1.500</td></tr>
+    <tr class="tot"><td><strong>Margen bruto</strong> · 53% · markup ×7</td><td class="v">$37.500</td></tr>
+    <tr class="tot"><td><strong>CPA break-even</strong> — el máximo que podés pagar por cliente</td><td class="v">$37.500</td></tr>
+    <tr><td>CPA objetivo <span class="faint">(dejando ~25% de margen)</span></td><td class="v">~$20.000</td></tr>
+    <tr><td>ROAS break-even</td><td class="v">1,87</td></tr>
+  </table>
+  <div class="box warn">
+    <div class="k">El número que cambia todo</div>
+    <p>Si tu costo por compra real supera los $37.500, <strong>estás perdiendo plata aunque el administrador de Meta te muestre un ROAS positivo</strong> — porque Meta no conoce tus costos. Ese número es tu única brújula.</p>
+  </div>
+  <h4><span class="n">→</span> Las tres reglas del costeo</h4>
+  <ol class="num">
+    <li><strong>Costeá en el peor escenario.</strong> Si ofrecés 3 cuotas sin interés, asumí que el 100% compra en 3 cuotas. No el promedio: el peor caso. Las comisiones de pasarela varían según cuotas y según cuándo recibís la plata.</li>
+    <li><strong>El precio se define último.</strong> Primero todos los costos, después el precio coherente con el valor percibido y con el gap de mercado. Nunca al revés.</li>
+    <li><strong>Medí en tiempo real.</strong> Con costos reales descontados, idealmente con una herramienta que te dé el <em>true ROAS</em>. Sin eso, escalás a ciegas y te enterás a fin de mes.</li>
+  </ol>
+  <div class="quote">El margen no se arregla bajando costos.<br><span class="hl">Se arregla armando bien la oferta.</span></div>
+</section>
+
+<section class="sec" id="s13" data-t="Arquitectura de oferta">
+  <div class="secno">13</div>
+  <h3>Arquitectura de oferta</h3>
+  <p>La oferta es la palanca número uno del negocio. Estas son las piezas que la componen.</p>
+
+  <h4><span class="n">01</span> El offer stack</h4>
+  <p>Va siempre <strong>antes del botón de agregar al carrito</strong>. Resume de forma rápida todo lo que hace tu producto y, sobre todo, <strong>resuelve objeciones anticipadamente</strong>. Cada línea del stack debería matar una objeción concreta del Documento B.</p>
+  <div class="box dark">
+    <div class="k">Ejemplo real — una almohada cervical</div>
+    <ul class="li">
+      <li>Reduce dolores de cuello, hombros y cabeza al despertar</li>
+      <li>Espuma memory premium que se adapta a tu postura</li>
+      <li><strong>Dos alturas para dormir boca arriba o de costado</strong> → mata "yo duermo de costado, no me va a servir"</li>
+      <li><strong>Funda suave y respirable</strong> → mata "en verano me va a dar calor"</li>
+      <li>Lavable para uso diario</li>
+      <li>Alinea cuello y columna toda la noche</li>
+    </ul>
+  </div>
+
+  <h4><span class="n">02</span> Bundles por ruptura de cantidad</h4>
+  <p>Suben el ticket sin adquirir un cliente más. La estructura estándar:</p>
+  <table class="t">
+    <tr><th>Cantidad</th><th>Qué incluye</th><th class="hi">Rol</th></tr>
+    <tr><td><strong>1 unidad</strong></td><td>Precio normal</td><td>Entrada</td></tr>
+    <tr><td><strong>2 unidades</strong></td><td>Descuento + envío gratis</td><td>El "más elegido" — default visual</td></tr>
+    <tr><td><strong>3 unidades</strong></td><td>Más descuento + envío gratis + bonus</td><td>Mejor deal, ancla de valor</td></tr>
+  </table>
+  <p>Un ejemplo concreto: una almohada a $79.990. Si compran dos, envío gratis, un beneficio extra y dos antifaces de regalo — pagan $130.000 en vez de $160.000. <strong>El ticket promedio de esa tienda pasó a rondar los $140.000.</strong> Sin bundles, la gente simplemente no compra dos.</p>
+
+  <h4><span class="n">03</span> Cross-sells en el sidecart</h4>
+  <p>La palanca más rentable de todas. Cuando agregan al carrito, aparece un complementario. <strong>El producto héroe ya se comió el CPA, el envío y la logística</strong> — así que el cross-sell entra a margen casi puro.</p>
+  <div class="box">
+    <div class="k">La cuenta</div>
+    <p>Crema a $42.000 + masajeador complementario a $20.000 (que te cuesta $7.000) = <strong>$13.000 de profit extra por compra</strong>, prácticamente sin costo de adquisición. Ese margen se reinyecta en pauta o se acumula.</p>
+  </div>
+
+  <h4><span class="n">04</span> El envío como upsell</h4>
+  <p>El envío prioritario es <strong>despacho prioritario</strong> (mismo día o el siguiente) y es ganancia casi pura. Combinado con el umbral de envío gratis, arma un sistema que empuja a agregar producto:</p>
+  <ul class="li">
+    <li>Envío estándar con costo tope si el pedido está por debajo del umbral</li>
+    <li>Envío gratis por encima del umbral (que se fija justo arriba del ticket de una unidad)</li>
+    <li>Envío prioritario como opción pagada en ambos casos</li>
+  </ul>
+  <p>El efecto combinado puede llevar un pedido de $79.000 a $101.000 sin tocar el precio del producto.</p>
+
+  <h4><span class="n">05</span> Upsells y downsells post-compra</h4>
+  <p>Después de la compra, un OTO. La regla: <strong>el upsell tiene que ser como manteca al bife</strong> — complementa el producto principal. Dos lógicas válidas:</p>
+  <ol class="num">
+    <li>Que logre el resultado <strong>mejor, más rápido o más fácil</strong></li>
+    <li>Que resuelva un <strong>problema nuevo</strong> que aparece después del primero</li>
+  </ol>
+  <p>Si dice que no → downsell (misma idea, menor beneficio, menor precio). <strong>Cuidado con el exceso</strong>: demasiados upsells fatigan y bajan el LTV.</p>
+</section>
+
+<section class="sec" id="s14" data-t="El impacto real de subir el AOV">
+  <div class="secno">14</div>
+  <h3>El impacto real de <span class="hl">subir el AOV</span></h3>
+  <p>Juntando bundles y cross-sells, el ticket promedio sube típicamente entre un <strong>25 y un 40%</strong> sin tocar el CPA. Y eso tiene un segundo efecto que es más importante que el primero.</p>
+  <div class="stats c3">
+    <div class="stat"><div class="v">+25-40%</div><div class="k">De ticket promedio,<br>sin adquirir un cliente más</div></div>
+    <div class="stat"><div class="v">↑ Margen</div><div class="k">Más plata por pedido<br>con el mismo costo fijo</div></div>
+    <div class="stat"><div class="v">↑ CPA techo</div><div class="k">Podés pagar más por cliente<br>y le ganás la subasta</div></div>
+  </div>
+  <p>Ese tercer efecto es el que decide competencias. Cuando dos marcas pelean por el mismo cliente en la misma subasta, <strong>gana la que puede pagar más.</strong> Y cuánto podés pagar es función directa de tu AOV y de tu LTV.</p>
+</section>
+
+<!-- ══════ PARTE 4 — MARCA ══════ -->
+<section class="part" id="p4" data-part="Marca">
+  <div class="partno">04</div>
+  <div class="partk">Parte 4</div>
+  <h2>Marca: el sistema de <span class="hl">confianza</span></h2>
+  <p class="pd">El branding no es diseño. Es la herramienta que hace que alguien te crea en cinco segundos y acepte pagar más que al de al lado.</p>
+</section>
+
+<section class="sec" id="s15" data-t="Qué es branding de verdad">
+  <div class="secno">15</div>
+  <h3>Qué es branding <span class="hl">de verdad</span></h3>
+  <p>Cuando se escucha "branding", casi todos piensan en estética: paleta de colores, logo, tipografía. Eso es una parte chica.</p>
+  <div class="quote">Branding es <span class="hl">generar confianza rápido.</span></div>
+  <p>Y además tiene que lograr dos cosas: que se entienda <strong>rápido qué vendés</strong>, y que se entienda <strong>cómo te posicionás</strong> — que tenga lógica lo que prometés.</p>
+  <div class="box warn">
+    <div class="k">La estética no vende</div>
+    <p>Hay tiendas feas —feas con ganas— que facturan muchísimo. Lo que vende no es lo lindo. Lo que vende es <strong>el copy</strong> (la habilidad número uno del e-commerce, por lejos), <strong>la oferta</strong>, <strong>el dolor</strong> y <strong>la prueba social</strong>. En nichos como belleza la estética pesa un poco más, pero incluso ahí lo que vende es el copy y el posicionamiento.</p>
+  </div>
+  <h4><span class="n">→</span> La regla que más plata cuesta ignorar</h4>
+  <p><strong>No compitas por ser el más barato.</strong> Es la posición más frágil que existe: no tenés margen para pagar CPA, no tenés margen para mejorar el producto, y siempre va a aparecer alguien dispuesto a perder más plata que vos.</p>
+</section>
+
+<section class="sec" id="s16" data-t="Posicionamiento: elegir dónde parás">
+  <div class="secno">16</div>
+  <h3>Posicionamiento: <span class="hl">elegir dónde parás</span></h3>
+  <p>El mismo producto se puede posicionar de formas completamente distintas. El ejemplo clásico, con sillas de trabajo:</p>
+  <div class="cards c3">
+    <div class="card"><div class="k">Enfoque A</div><h5>Gamer</h5><p>Estética agresiva, colores, comunidad, performance.</p></div>
+    <div class="card"><div class="k">Enfoque B</div><h5>Ejecutivo</h5><p>Profesional, corporativo, sobrio, status.</p></div>
+    <div class="card"><div class="k">Enfoque C</div><h5>Clínico / ortopédico</h5><p>Salud, respaldo médico, prevención de lesiones.</p></div>
+  </div>
+  <p>Tres marcas, tres precios, tres públicos. <strong>El producto puede ser casi el mismo.</strong> Lo que cambia es a quién le hablás y desde dónde.</p>
+  <h4><span class="n">→</span> De dónde sale tu posicionamiento</h4>
+  <ul class="li">
+    <li><strong>El avatar</strong> — a quién le vendés en concreto</li>
+    <li><strong>La promesa</strong> — el resultado o la transformación que ofrecés</li>
+    <li><strong>Las objeciones</strong> — qué frena la compra y cómo lo desactivás</li>
+    <li><strong>La competencia</strong> — para encontrar el <em>gap</em> del mercado y pararte ahí</li>
+  </ul>
+  <p>Las palancas disponibles, según el nicho: más premium, más confiable, más clínico o científico, más aspiracional o estético, más comunitario.</p>
+</section>
+
+<section class="sec" id="s17" data-t="Coherencia: la regla de oro">
+  <div class="secno">17</div>
+  <h3>Coherencia: la regla de oro</h3>
+  <p>Todo tiene que ser coherente entre el anuncio, la tienda, el feed de Instagram y cualquier pieza de diseño. El objetivo: <strong>que alguien te vea en cualquier lado y sepa que sos vos.</strong></p>
+  <div class="flow">
+    <div class="s lit"><div class="t">Punto 1</div><div class="n">Los anuncios</div></div>
+    <div class="s lit"><div class="t">Punto 2</div><div class="n">La tienda</div></div>
+    <div class="s lit"><div class="t">Punto 3</div><div class="n">El feed</div></div>
+    <div class="s lit"><div class="t">Punto 4</div><div class="n">Los emails</div></div>
+    <div class="s lit"><div class="t">Punto 5</div><div class="n">El packaging</div></div>
+  </div>
+  <p>Un dato práctico: <strong>cuanto más trabajado esté el Instagram y el Facebook de la marca, más confianza y más conversión.</strong> La gente chequea. Un perfil vacío con anuncios corriendo genera desconfianza inmediata.</p>
+  <div class="rule">Lo que importa no es que la página sea <b>mega estética</b>. Lo que importa es que sea <b>real, coherente y confiable</b>, con orden visual.</div>
+</section>
+
+<section class="sec" id="s18" data-t="El brandboard: qué tiene que incluir">
+  <div class="secno">18</div>
+  <h3>El brandboard: qué tiene que <span class="hl">incluir</span></h3>
+  <p>El brandboard es el documento que fija la identidad. Se construye en tres fases y después alimenta todo: landings, imágenes, flujos de email, packaging.</p>
+
+  <h4><span class="n">Fase 1</span> Naming y verificación</h4>
+  <p>Generar opciones, y después <strong>revisar cada una por riesgo de marca</strong> — similitud fonética o visual con marcas grandes. Un nombre a una letra de distancia de una marca establecida es un problema legal esperando.</p>
+  <p>Verificación obligatoria en tres frentes antes de decidir:</p>
+  <table class="t">
+    <tr><th>Frente</th><th>Dónde</th><th class="hi">Qué chequear</th></tr>
+    <tr><td><strong>Dominio</strong></td><td>GoDaddy / Hostinger</td><td>Priorizar .com.ar o .com. Evitar .shop y .store. Alternativas: .lat, .site, .info</td></tr>
+    <tr><td><strong>Instagram</strong></td><td>La app</td><td>Que el @ deseado esté libre (ej. marca.ar)</td></tr>
+    <tr><td><strong>INPI</strong></td><td>portaltramites.inpi.gov.ar</td><td>Consulta de marcas por denominación y clase. Ojo especialmente con la clase 35</td></tr>
+  </table>
+  <div class="rule">Si el nombre está tomado en una <b>clase clave</b>, no avances con ese nombre. Cambiar de nombre al año duele mucho más que perder una tarde eligiendo otro.</div>
+
+  <h4><span class="n">Fase 2</span> Personalidad de marca</h4>
+  <ul class="li">
+    <li><strong>Dos arquetipos</strong> — por ejemplo, la cuidadora y el sabio</li>
+    <li><strong>Cinco adjetivos</strong> que definan la personalidad</li>
+    <li><strong>Tono de voz operativo</strong> — cómo habla la marca y cómo NO habla</li>
+    <li><strong>Palabras de marca</strong> a usar y <strong>palabras prohibidas</strong></li>
+    <li><strong>Posicionamiento</strong> explícito (premium, accesible, clínico)</li>
+    <li><strong>Referencias visuales</strong> — tres o cuatro marcas de afuera que sirvan de norte</li>
+  </ul>
+
+  <h4><span class="n">Fase 3</span> Identidad visual</h4>
+  <ul class="li">
+    <li>Paleta de colores <strong>con reglas de combinación</strong></li>
+    <li>Tipografías con reglas de uso</li>
+    <li><strong>Cinco variantes de logo:</strong> wordmark horizontal (principal), vertical con linaje, monograma circular (favicon y perfil de IG), monocromo e invertido</li>
+    <li>Estilo fotográfico</li>
+    <li>Estilo de creatividad para anuncios</li>
+    <li><strong>Do's and don'ts</strong> — lo que evita que la marca se desarme cuando delegás diseño</li>
+  </ul>
+  <div class="box">
+    <div class="k">Apalancamiento rápido</div>
+    <p>Guiate de marcas de afuera que ya estén resueltas en tu categoría. No para copiarlas: para entender los <strong>códigos visuales</strong> de tu nicho y decidir si los seguís o los rompés a propósito.</p>
+  </div>
+</section>
+
+<section class="sec" id="s19" data-t="Las 5 razones por las que alguien compra">
+  <div class="secno">19</div>
+  <h3>Las 5 razones por las que <span class="hl">alguien compra</span></h3>
+  <p>Todo lo anterior existe para lograr estas cinco cosas. Si las cinco están, compra. Si falta una, no.</p>
+  <div class="chain">
+    <div class="step"><span class="sn">01</span><span><strong>Entiende</strong> lo que vendés</span></div>
+    <div class="step"><span class="sn">02</span><span><strong>Confía</strong> en tu marca, o siente que es algo real</span></div>
+    <div class="step"><span class="sn">03</span><span><strong>Siente que necesita</strong> el producto o la transformación</span></div>
+    <div class="step"><span class="sn">04</span><span><strong>Ve pruebas</strong> — testimonios, gente a la que le funcionó</span></div>
+    <div class="step hot"><span class="sn">05</span><span><strong>Ve una oferta lógica</strong></span></div>
+  </div>
+  <div class="quote">El mensaje es lo central.<br><span class="hl">Es lo que realmente decide si compra o no compra.</span></div>
+</section>
+
+<!-- ══════ PARTE 5 — TIENDA Y FUNNEL ══════ -->
+<section class="part" id="p5" data-part="Tienda y funnel">
+  <div class="partno">05</div>
+  <div class="partk">Parte 5</div>
+  <h2>Tienda y funnel</h2>
+  <p class="pd">Dónde aterriza el tráfico que pagaste. Acá es donde se gana o se pierde entre el 30 y el 50% de las ventas, y casi siempre sin que el dueño se entere.</p>
+</section>
+
+<section class="sec" id="s20" data-t="El funnel que tenés vs. el que convierte">
+  <div class="secno">20</div>
+  <h3>El funnel que tenés vs. <span class="hl">el que convierte</span></h3>
+  <p>Casi todas las marcas chicas corren la versión mínima. Y funciona… hasta que el CPA sube.</p>
+  <h5>El funnel básico</h5>
+  <div class="flow">
+    <div class="s ghost"><div class="t">TOF</div><div class="n">Anuncio</div></div>
+    <div class="a">→</div>
+    <div class="s ghost"><div class="t">—</div><div class="n">Página de producto</div></div>
+    <div class="a">→</div>
+    <div class="s ghost"><div class="t">—</div><div class="n">Checkout</div></div>
+    <div class="a">→</div>
+    <div class="s ghost"><div class="t">—</div><div class="n">Gracias</div></div>
+  </div>
+  <h5>El funnel completo</h5>
+  <div class="flow">
+    <div class="s lit"><div class="t">TOF</div><div class="n">Anuncio</div></div>
+    <div class="a">→</div>
+    <div class="s lit"><div class="t">MOF</div><div class="n">Pre-sell<br><span style="font-weight:400;color:var(--ink-faint);font-size:.85em">advertorial / VSL</span></div></div>
+    <div class="a">→</div>
+    <div class="s lit"><div class="t">BOF</div><div class="n">Sales page</div></div>
+    <div class="a">→</div>
+    <div class="s lit"><div class="t">AOV</div><div class="n">Sidecart<br><span style="font-weight:400;color:var(--ink-faint);font-size:.85em">bundles + bumps</span></div></div>
+    <div class="a">→</div>
+    <div class="s lit"><div class="t">AOV</div><div class="n">Upsell /<br>Downsell</div></div>
+  </div>
+  <p>Y en paralelo, cubriendo a los que no compraron: <strong>captura de email + retargeting</strong> en Meta y TikTok para quienes vieron el pre-sell, vieron la sales page, agregaron al carrito o iniciaron checkout.</p>
+  <div class="box">
+    <div class="k">Aclaración importante sobre retargeting</div>
+    <p>Esto <strong>no significa segmentar con públicos personalizados en el testeo</strong>. Significa cubrir todas las etapas del funnel con tus anuncios. Y los anuncios de BOF van directo a la página de producto, no al pre-sell.</p>
+  </div>
+</section>
+
+<section class="sec" id="s21" data-t="Qué destino usar según el producto">
+  <div class="secno">21</div>
+  <h3>Qué destino usar <span class="hl">según el producto</span></h3>
+  <p>No todos los productos necesitan lo mismo. Las tres opciones son válidas; la elección depende del producto, el nivel de conciencia y cuánta educación necesita el comprador.</p>
+  <table class="t">
+    <tr><th>Formato</th><th>Mejor para</th><th class="hi">Estilo</th></tr>
+    <tr><td><strong>VSL page</strong></td><td>Productos complejos, tickets altos, categorías nuevas. Cuando necesitás máxima educación y confianza</td><td>Video protagonista + soporte en texto. Emocional y lógico</td></tr>
+    <tr><td><strong>Advertorial</strong></td><td>Cuando el comprador necesita convencerse de que <em>hay</em> un problema antes de buscar solución. Nivel 1 y 2</td><td>Artículo estilo editorial. Parece contenido, no un anuncio</td></tr>
+    <tr><td><strong>PDP directa</strong></td><td>Productos simples, compra por impulso, valor obvio a la vista. Nivel 4 y 5</td><td>Página de producto optimizada con bundles, reviews, garantía</td></tr>
+  </table>
+  <div class="box warn">
+    <div class="k">Regla crítica — continuidad anuncio → landing</div>
+    <p>Cada ángulo que corras debería apuntar a una landing específica para ese ángulo. <strong>Si tenés 4 ángulos, necesitás 4 landings</strong> (o al menos 4 versiones del hero y los primeros bloques). Mandar todos los ángulos a una landing genérica destruye la conversión: el síntoma típico es <strong>CTR alto y conversión baja</strong>.</p>
+  </div>
+</section>
+
+<section class="sec" id="s22" data-t="Anatomía de la página de producto">
+  <div class="secno">22</div>
+  <h3>Anatomía de la <span class="hl">página de producto</span></h3>
+  <p>La estructura varía por nicho — no es lo mismo indumentaria que belleza que hogar. Pero hay bloques que casi siempre funcionan, en este orden.</p>
+
+  <h4><span class="n">Bloque A</span> Producto + oferta (arriba del todo)</h4>
+  <ol class="num">
+    <li><strong>Hero:</strong> título con la promesa o el resultado · subtítulo con el mecanismo o el diferenciador · precio y cuotas · CTA claro</li>
+    <li><strong>Rating stars</strong> — prueba social inconsciente, genera confianza antes de leer nada</li>
+    <li><strong>Etiqueta de campaña</strong> si aplica (oferta de temporada, fecha especial)</li>
+    <li><strong>Offer stack</strong> — el bloque más importante. Siempre antes del botón de compra</li>
+    <li><strong>Bundles</strong> — 1 unidad / 2 (default, "más elegido") / 3 (mejor deal), con badges de envío, garantía y pagos</li>
+    <li><strong>Confianza inmediata</strong> — íconos de envío, pagos seguros, garantía resumida, "qué incluye"</li>
+  </ol>
+  <div class="rule">La <b>foto de producto</b> es lo más importante de toda la página. Al principio cuesta muchísimo hacerlas bien; después se agarra la mano y sale rápido. Guía de referencia: <b>7 a 10 piezas</b> que cubran producto, uso, beneficio, comparación y prueba.</div>
+
+  <h4><span class="n">Bloque B</span> La landing real</h4>
+  <p>Todo lo anterior es "información de producto". La landing propiamente dicha empieza después del separador de sección.</p>
+  <ul class="li">
+    <li><strong>Sección dolor</strong> — foto de una persona en la situación real que querés resolver, con copy que apunte de lleno al dolor</li>
+    <li><strong>Sección outcome</strong> — la transformación, la vida ideal después del producto. Siempre en este orden: primero el dolor, después el resultado</li>
+    <li><strong>Reviews</strong> con lenguaje del avatar y fotos que se parezcan al buyer persona</li>
+    <li><strong>Sección de prueba o validación</strong> — evidencia, certificaciones, demostración</li>
+    <li><strong>Tabla comparativa</strong> contra las alternativas del mercado</li>
+    <li><strong>Lista de desplegables</strong> con la información relevante</li>
+    <li><strong>FAQ</strong> — y acá viene lo importante</li>
+    <li><strong>CTA final</strong> y <strong>sticky add to cart</strong> siempre presente</li>
+  </ul>
+  <div class="box warn">
+    <div class="k">Las FAQ no son informativas</div>
+    <p>Son <strong>las últimas objeciones que frenan la compra, disfrazadas de preguntas.</strong> Cada FAQ tiene que destruir una objeción concreta del Documento B. Ejemplo: "¿Funciona con agua dura?" en realidad significa "tengo miedo de que no funcione en mi caso particular".</p>
+  </div>
+  <p>Sacale el botón a las secciones de imagen + texto: no tiene sentido tener botones sueltos cuando ya está el sticky add to cart siguiendo al usuario.</p>
+</section>
+
+<section class="sec" id="s23" data-t="Configuración de la tienda">
+  <div class="secno">23</div>
+  <h3>Configuración de la tienda</h3>
+  <p>Los detalles que parecen menores y mueven la aguja. Referencia sobre Shopify, aplicable en concepto a Tiendanube.</p>
+
+  <h4><span class="n">→</span> Configuración general</h4>
+  <ul class="li">
+    <li><strong>Prefijo de pedidos:</strong> arrancar con un "3" para que los pedidos empiecen en ~31.000. Señal de confianza: transmite que la tienda ya vende</li>
+    <li><strong>Al pagar un pedido:</strong> no preparar líneas automáticamente y no archivar</li>
+    <li><strong>Plan:</strong> evaluar el plan alto si hay promoción de meses gratis — la comisión por venta baja bastante y se puede reducir después</li>
+  </ul>
+
+  <h4><span class="n">→</span> Pagos y checkout</h4>
+  <ul class="li">
+    <li>Mercado Pago con tarjetas, Checkout Pro y cuotas. Captura automática en pantalla de pago</li>
+    <li><strong>Checkout sin fricción:</strong> solo apellido, teléfono obligatorio, sin nombre de empresa ni dirección 2</li>
+    <li>Sacar los campos de marketing y propina</li>
+    <li>Thank you page aprovechada para el post-compra</li>
+  </ul>
+
+  <h4><span class="n">→</span> Envíos</h4>
+  <ul class="li">
+    <li>Manual hasta ~10 ventas por día; después, operador logístico con rótulos</li>
+    <li>Tarifa personalizada por correo, con descripción de entrega amplia (<em>"1 a 4 días hábiles"</em>) para reducir consultas</li>
+    <li>Envíos condicionales: costo tope por debajo del umbral, gratis por encima</li>
+    <li>El umbral se fija <strong>justo arriba del ticket de una unidad</strong>, para empujar el segundo producto</li>
+  </ul>
+
+  <h4><span class="n">→</span> Apps que hacen la diferencia</h4>
+  <table class="t">
+    <tr><th>App</th><th class="hi">Para qué</th></tr>
+    <tr><td><strong>Reviews</strong> (Loox o similar)</td><td>Reseñas con foto. Prueba social visual</td></tr>
+    <tr><td><strong>Slide cart</strong></td><td>Barra de progreso de envío gratis, venta sugestiva "para llevar con tu compra", señales de confianza</td></tr>
+    <tr><td><strong>Bundles</strong></td><td>Ruptura de cantidad con etiquetas de descuento. <strong>Sin bundles la gente no compra 2</strong></td></tr>
+  </table>
+  <div class="rule">Para quien recién arranca: <b>homepage vacía con un banner y un footer.</b> Nada de colecciones ni productos destacados. Las políticas y la página de contacto importan cuando escalás, no para salir a validar.</div>
+</section>
+
+<section class="sec" id="s24" data-t="Checklist pre-lanzamiento">
+  <div class="secno">24</div>
+  <h3>Checklist pre-lanzamiento</h3>
+  <p>Un solo error mal puesto arruina un testeo entero y te hace descartar un producto que era bueno. Recién cuando todo esté tildado, dale pauta.</p>
+  <div class="check">
+    <div><span><strong>Meta sin ayudas ni mejoras Advantage</strong> activadas — y revisar de nuevo después de duplicar</span></div>
+    <div><span>Medio de pago cargado en la cuenta publicitaria</span></div>
+    <div><span>Pixel creado, conectado a la cuenta y a la tienda</span></div>
+    <div><span>Precios, bundles y descuentos verificados en carrito y checkout</span></div>
+    <div><span>Impuestos configurados correctamente (que no se sumen dos veces)</span></div>
+    <div><span>Envíos probados <strong>en los dos sentidos del umbral</strong> de envío gratis</span></div>
+    <div><span>Medios de pago probados uno por uno</span></div>
+    <div><span><strong>Autocompra real completa desde el celular</strong>, y después reembolsada</span></div>
+    <div><span>Email de confirmación y página de gracias revisados</span></div>
+    <div><span>Página de producto sin errores, sin palabras en inglés, nada desconfigurado</span></div>
+    <div><span><strong>Todo revisado desde el celular</strong> — el 99,9% del tráfico de Meta entra por mobile</span></div>
+    <div><span>Stock cargado, o el tracking de stock desactivado</span></div>
+    <div><span>Todas las variantes comprables, ninguna agotada por error</span></div>
+    <div><span>Pixel midiendo: View Content, Add to Cart, Initiate Checkout y Purchase</span></div>
+    <div><span>URL de destino correcta, verificada con vista previa</span></div>
+    <div><span><strong>Nomenclatura aplicada</strong> en campaña, conjunto y anuncios, idéntica al tracker</span></div>
+  </div>
+  <div class="box warn">
+    <div class="k">Cuenta publicitaria nueva</div>
+    <p>Si la cuenta es nueva, dejá los anuncios de venta para el final: primero "calentala" con una campaña de tráfico chica (unos 10 dólares a la homepage). Y validar con cuenta y píxel nuevos en CBO se puede, pero no es lo óptimo.</p>
+  </div>
+</section>
+
+<!-- ══════ PARTE 6 — CREATIVOS Y ADS ══════ -->
+<section class="part" id="p6" data-part="Creativos y ads">
+  <div class="partno">06</div>
+  <div class="partk">Parte 6</div>
+  <h2>Creativos y ads</h2>
+  <p class="pd">El motor de adquisición. Acá está la diferencia entre depender de que la pegues y tener una fábrica que produce ganadores de forma predecible.</p>
+</section>
+
+<section class="sec" id="s25" data-t="La jerarquía del creativo">
+  <div class="secno">25</div>
+  <h3>La jerarquía del creativo</h3>
+  <p>Un anuncio se descompone en cuatro capas. Mezclarlas es la razón número uno por la que la gente testea mal.</p>
+  <div class="flow">
+    <div class="s"><div class="t">Capa 1</div><div class="n">Formato</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">Capa 2</div><div class="n">Concepto</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">Capa 3</div><div class="n">Ángulo</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">Capa 4</div><div class="n">Variación</div></div>
+  </div>
+  <table class="t">
+    <tr><th>Capa</th><th>Qué es</th><th class="hi">Ejemplo</th></tr>
+    <tr><td><strong>Formato</strong></td><td>Cómo se ejecuta técnicamente</td><td>UGC humano, UGC con IA, b-roll, estático con flechas</td></tr>
+    <tr><td><strong>Concepto</strong></td><td>La idea narrativa</td><td>Antes / después</td></tr>
+    <tr><td><strong>Ángulo</strong></td><td>Qué dolor específico toca</td><td>Estrías post-embarazo</td></tr>
+    <tr><td><strong>Variación</strong></td><td>Un cambio chico sobre lo anterior</td><td>Otro hook, otro cierre, otro b-roll</td></tr>
+  </table>
+  <p>Un mismo concepto de <strong>unboxing-demo</strong> se puede ejecutar como UGC real o como UGC generado con IA. Un mismo concepto de <strong>características-beneficios</strong> puede ser una persona a cámara, un b-roll editado o un estático con flechas. <strong>Mismo concepto, formatos distintos, compradores distintos.</strong></p>
+  <div class="quote">Mejor <span class="hl">9 conceptos diferentes</span><br>que 9 variaciones del mismo anuncio.</div>
+</section>
+
+<section class="sec" id="s26" data-t="Los 7 conceptos que funcionan siempre">
+  <div class="secno">26</div>
+  <h3>Los <span class="hl">7 conceptos</span> que funcionan siempre</h3>
+  <p>Estos siete sostienen prácticamente todo el e-commerce que escala. En la estructura de testeo, <strong>cada conjunto prueba un concepto distinto</strong>.</p>
+  <ol class="num">
+    <li><strong>Antes / después</strong> — la transformación mostrada, no contada. Funciona donde el resultado es visible. Mejor con nivel 2 y 3 de conciencia</li>
+    <li><strong>Problema — solución</strong> — se nombra el dolor con las palabras del cliente, se agita, y recién ahí aparece el producto. El más versátil. Nivel 1 y 2</li>
+    <li><strong>Características — beneficios</strong> — cada característica con su "y a mí qué". Nivel 3 y 4</li>
+    <li><strong>Unboxing y demo</strong> — el producto en la mano, funcionando. Reduce la incertidumbre de compra como ninguno. Nivel 3 y 4</li>
+    <li><strong>Venta directa / oferta</strong> — producto, precio, beneficio, urgencia. El mejor en retargeting, el peor en frío. Nivel 5</li>
+    <li><strong>"Lo que pedí vs. lo que me llevó"</strong> — nativo por excelencia, no parece un anuncio. Nivel 1 y 2</li>
+    <li><strong>Transformación día 1 — día 30</strong> — como el antes/después pero con el proceso adentro. El mejor cuando el resultado tarda</li>
+  </ol>
+  <div class="rule">Malo: <b>"Tiene vitamina C."</b><br>Bueno: <b>"La vitamina C en esta concentración penetra las 3 capas de la piel en 20 minutos, por eso ves resultados al día siguiente."</b></div>
+  <div class="box">
+    <div class="k">Cómo se usan</div>
+    <p>No elijas "el mejor". <strong>Corré los siete y dejá que la data te diga cuál es el tuyo.</strong> Casi todas las marcas descubren que dos o tres conceptos concentran la mayoría de sus ganadores — pero cuáles son es imposible de adivinar antes de probarlos.</p>
+  </div>
+</section>
+
+<section class="sec" id="s27" data-t="Formatos y los que tienen foso">
+  <div class="secno">27</div>
+  <h3>Formatos, y los que tienen <span class="hl">foso</span></h3>
+  <p>La diversidad de formato es lo que sostiene una cuenta viva. El que tira siempre el mismo la quema.</p>
+  <div class="cards c3">
+    <div class="card"><div class="k">Formato</div><h5>UGC humano</h5><p>Persona real a cámara. El más creíble, el que mejor escala en frío.</p></div>
+    <div class="card"><div class="k">Formato</div><h5>UGC con IA</h5><p>Barato y rápido de producir en volumen. Ideal para testear ángulos.</p></div>
+    <div class="card"><div class="k">Formato</div><h5>B-roll editado</h5><p>Producto en contexto, con ritmo. Bueno para conceptos de beneficios.</p></div>
+    <div class="card"><div class="k">Formato</div><h5>Estático con flechas</h5><p>CPM más bajo, producción de minutos. Muy subestimado.</p></div>
+    <div class="card"><div class="k">Formato</div><h5>Unboxing / demo</h5><p>Reduce fricción de compra. Fuerte en retargeting.</p></div>
+    <div class="card"><div class="k">Formato</div><h5>Antes / después visual</h5><p>El más directo cuando el resultado se ve.</p></div>
+  </div>
+  <div class="box warn">
+    <div class="k">Ojo con descartar los estáticos</div>
+    <p>No es cierto que los videos siempre convierten mejor. <strong>Los estáticos a veces funcionan mucho mejor</strong>, y son más baratos de pautar porque tienen CPMs más bajos por naturaleza. El que los descarta se saca la mitad de la baraja.</p>
+  </div>
+  <h4><span class="n">→</span> Los formatos con foso</h4>
+  <p>Hay formatos difíciles o caros de replicar. Eso es ventaja que no se copia en una tarde:</p>
+  <ul class="li">
+    <li><strong>Debates</strong> — requieren producción y participantes reales</li>
+    <li><strong>Figuras de autoridad</strong> — un profesional real hablando del producto. Acceso, credenciales y costo</li>
+    <li><strong>El producto dentro de podcasts</strong> — relaciones y presupuesto</li>
+    <li><strong>Whitelisting con influencers grandes</strong> — costo y acceso</li>
+    <li><strong>Founder ad</strong> — el dueño a cámara</li>
+  </ul>
+  <p>El <strong>founder ad</strong> merece párrafo aparte. ¿Qué porcentaje de la gente que hace e-commerce está dispuesta a poner la cara? Casi nadie, porque la mayoría corre productos y no quiere estar al frente de una marca. <strong>Esa resistencia del resto es exactamente lo que lo convierte en apalancamiento para vos.</strong></p>
+  <div class="rule">En la era de la IA, cualquiera produce un anuncio nativo decente. <b>Eso dejó de ser ventaja.</b> Lo que no se replica con un prompt es acceso, credenciales y voluntad de dar la cara.</div>
+</section>
+
+<section class="sec" id="s28" data-t="El hook: el 80% del rendimiento">
+  <div class="secno">28</div>
+  <h3>El hook: el <span class="hl">80%</span> del rendimiento</h3>
+  <p>Los primeros tres segundos deciden casi todo. El framework en cuatro partes:</p>
+  <div class="flow">
+    <div class="s"><div class="t">1</div><div class="n">Persona</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">2</div><div class="n">Problema</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">3</div><div class="n">Interrupción</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">4</div><div class="n">Promesa</div></div>
+  </div>
+  <ol class="num">
+    <li><strong>Persona</strong> — el <em>buyer callout</em>. Nombrar al cliente ideal en voz alta para que el resto siga de largo. "Si tenés estrías después del embarazo…" cualifica mejor que cualquier segmentación del administrador</li>
+    <li><strong>Problema</strong> — el dolor específico, con las palabras del research</li>
+    <li><strong>Interrupción</strong> — el giro que rompe la expectativa y obliga a quedarse</li>
+    <li><strong>Promesa</strong> — qué se lleva si sigue mirando</li>
+  </ol>
+  <h4><span class="n">→</span> Los 6 tipos de hook</h4>
+  <table class="t">
+    <tr><th>Tipo</th><th>Qué hace</th><th class="hi">De dónde sale</th></tr>
+    <tr><td><strong>Verdad contraria</strong></td><td>Desafía algo que todos creen. Genera tensión y obliga a escuchar</td><td>Alternativas que ya probaron y fallaron</td></tr>
+    <tr><td><strong>Prueba específica</strong></td><td>Dato concreto con resultado medible. Credibilidad instantánea</td><td>Casos y números propios</td></tr>
+    <tr><td><strong>Advertencia de riesgo</strong></td><td>Miedo a perder, más potente que la promesa de ganar. Filtra fuerte</td><td>Cadena de consecuencias</td></tr>
+    <tr><td><strong>Brecha de curiosidad</strong></td><td>Crea una pregunta que solo se responde mirando</td><td>Gaps del mercado</td></tr>
+    <tr><td><strong>Error común</strong></td><td>Identificación por vulnerabilidad: "eso me pasa a mí"</td><td>Dolores textuales del research</td></tr>
+    <tr><td><strong>Rompe-mito</strong></td><td>Ataca una objeción de frente</td><td>Objeciones reales de clientes</td></tr>
+  </table>
+  <h4><span class="n">→</span> El filtro de 5 criterios</h4>
+  <table class="t">
+    <tr><th>#</th><th>Criterio</th><th class="hi">Peso</th></tr>
+    <tr><td class="v">1</td><td><strong>Claridad</strong> — ¿se entiende en 3 segundos?</td><td>Crítico</td></tr>
+    <tr><td class="v">2</td><td><strong>Relevancia</strong> — ¿conecta con tu comprador?</td><td>Crítico</td></tr>
+    <tr><td class="v">3</td><td><strong>Novedad</strong> — ¿hay algo que no se vio?</td><td>Alto</td></tr>
+    <tr><td class="v">4</td><td><strong>Especificidad</strong> — ¿números en vez de adjetivos?</td><td>Medio</td></tr>
+    <tr><td class="v">5</td><td><strong>Credibilidad</strong> — ¿hay razón para creerte, temprano?</td><td>Bonus</td></tr>
+  </table>
+  <div class="box warn">
+    <div class="k">El error que parece virtud</div>
+    <p>Un hook viral que frena a todo el mundo es un mal hook. Traés público equivocado, arruinás la optimización y le enseñás a Meta a buscar gente que no compra. <strong>Cualificá, no viralices.</strong></p>
+  </div>
+</section>
+
+<section class="sec" id="s29" data-t="Motivadores: el porqué de accionar hoy">
+  <div class="secno">29</div>
+  <h3>Motivadores: el porqué de <span class="hl">accionar hoy</span></h3>
+  <p>La variable más olvidada. Una persona puede tener el problema, saber que lo tiene, y aun así no comprar. <strong>Le falta el disparador.</strong></p>
+  <ul class="li">
+    <li><strong>Estacionales</strong> — verano, vuelta a clases, fiestas, cambio de estación</li>
+    <li><strong>De evento</strong> — casamiento, viaje, cumpleaños, una foto</li>
+    <li><strong>De umbral</strong> — "ya van tres meses", "se me acabó el que tenía"</li>
+    <li><strong>Sociales</strong> — un comentario de alguien, una foto en la que se vio</li>
+    <li><strong>De comparación</strong> — vio a alguien que lo resolvió</li>
+  </ul>
+  <p>El mismo anuncio con el mismo ángulo cambia por completo de rendimiento según el motivador que active. Y es <strong>la variable más barata de testear</strong>: se cambia en el hook y en el copy, sin volver a filmar.</p>
+</section>
+
+<section class="sec" id="s30" data-t="La estructura de testeo con purga">
+  <div class="secno">30</div>
+  <h3>La estructura de testeo <span class="hl">con purga</span></h3>
+  <p>El objetivo del testeo no es vender. <strong>Es sacar información</strong> sobre qué le habla a tu comprador.</p>
+  <div class="mgrid5" style="grid-template-columns:repeat(5,1fr);gap:8px;margin:24px 0">
+    <div class="card lit" style="padding:14px 8px;text-align:center"><div class="k" style="margin:0">CJ01</div><div style="font-size:14px;color:var(--ink)">6 ads</div></div>
+    <div class="card lit" style="padding:14px 8px;text-align:center"><div class="k" style="margin:0">CJ02</div><div style="font-size:14px;color:var(--ink)">6 ads</div></div>
+    <div class="card lit" style="padding:14px 8px;text-align:center"><div class="k" style="margin:0">CJ03</div><div style="font-size:14px;color:var(--ink)">6 ads</div></div>
+    <div class="card lit" style="padding:14px 8px;text-align:center"><div class="k" style="margin:0">CJ04</div><div style="font-size:14px;color:var(--ink)">6 ads</div></div>
+    <div class="card lit" style="padding:14px 8px;text-align:center"><div class="k" style="margin:0">CJ05</div><div style="font-size:14px;color:var(--ink)">6 ads</div></div>
+  </div>
+  <table class="t">
+    <tr><th>Elemento</th><th class="hi">Configuración</th></tr>
+    <tr><td>Tipo de campaña</td><td class="v">ABO</td></tr>
+    <tr><td>Conjuntos</td><td class="v">5 = 5 conceptos distintos</td></tr>
+    <tr><td>Anuncios por conjunto</td><td class="v">6</td></tr>
+    <tr><td>Presupuesto por conjunto</td><td class="v">$30 / día</td></tr>
+    <tr class="tot"><td><strong>Total del testeo</strong></td><td class="v">$150 / día</td></tr>
+    <tr><td>Segmentación</td><td class="v">Broad</td></tr>
+    <tr><td>Intereses / públicos custom</td><td class="v">Cero</td></tr>
+  </table>
+  <p>Los seis anuncios de un conjunto comparten concepto pero varían todo lo demás: <strong>buyer persona, ángulo, motivador, nivel de conciencia y formato.</strong> Esa diversidad es la que devuelve información cruzada.</p>
+  <h4><span class="n">→</span> Por qué ABO y no CBO</h4>
+  <p>Con CBO, Meta va a optimizar mejor en el 90% de los casos — y por eso muchos lo usan para testear. El problema es otro: <strong>le da casi toda la plata al concepto que arranca mejor</strong>, y los otros cuatro casi no gastan. Lo que no gasta no informa, así que te quedás con un ganador y cuatro conceptos sobre los que no sabés nada.</p>
+  <div class="rule"><b>ABO para testear, CBO y Advantage+ para escalar.</b> Herramientas distintas para trabajos distintos.</div>
+  <h4><span class="n">→</span> Por qué broad</h4>
+  <p>Meta ya sabe quién compra qué. Poner un interés no le da información: <strong>le saca espacio para trabajar.</strong> Achicás el pool y el CPM sube entre un 50 y un 60%. <strong>La segmentación la hace el creativo, no el administrador.</strong></p>
+  <div class="box">
+    <div class="k">Testear con poco capital</div>
+    <p>Testear con muy poca plata hace que muchas veces a Meta no le alcance y descarte cosas que eran buenas. Si el presupuesto es chico, mejor <strong>bajar de 3 a 2 buyers</strong> (unos 30 anuncios, ~90 USD) o repartir en tres bloques parejos, y reinvertir la liquidez de las primeras ventas. Lo que no sirve es "el testeo 37": eso es testear sin sistema.</p>
+  </div>
+</section>
+
+<section class="sec" id="s31" data-t="Nomenclatura de ads">
+  <div class="secno">31</div>
+  <h3>Nomenclatura de ads</h3>
+  <p>Sin nomenclatura no hay tracker, y sin tracker no hay hit rate. A los tres meses tenés 300 anuncios llamados "copia de copia de video 2 final".</p>
+  <div class="box warn">
+    <div class="k">Lo no negociable</div>
+    <ul class="li">
+      <li>El nombre del anuncio en Meta tiene que ser <strong>idéntico al ID del tracker</strong>. Ese match 1:1 permite actualizar métricas de forma automática</li>
+      <li><strong>El ID va primero.</strong> Si Meta le pega un " – Copy" al final al duplicar, el ID sobrevive intacto</li>
+      <li>Separador entre elementos: la barra <code>|</code></li>
+    </ul>
+  </div>
+  <h4><span class="n">→</span> Campaña</h4>
+  <div class="rule">Función #N | Tipo | Producto | País</div>
+  <ul class="li">
+    <li><strong>Función:</strong> Testeo · Escalado · Zombie</li>
+    <li><strong>Tipo:</strong> ABO · CBO · ADV+ · Bid Cap · Cost Cap</li>
+    <li><strong>Producto:</strong> solo si vendés más de uno. <strong>País:</strong> solo si escalás a más de un mercado (se omite en el 99% de los casos)</li>
+  </ul>
+  <p>Ejemplos: <code>Testeo #1 | ABO</code> · <code>Escalado #1 | ADV+</code> · <code>Zombie #3 | CBO Cost Cap</code></p>
+  <h4><span class="n">→</span> Conjunto</h4>
+  <div class="rule">CJ## | Eje de división | Funnel | Formato | Fecha</div>
+  <p>El conjunto es donde nace el anuncio, y el ID <code>CJ##</code> lo acompaña toda su vida. Dos reglas de homogeneidad: <strong>un conjunto, un solo funnel</strong> y <strong>un conjunto, un solo formato.</strong></p>
+  <div class="box dark">
+    <div class="k">Ejemplos reales</div>
+    <p style="font-family:var(--mono);font-size:14.5px;line-height:2;color:var(--ink-dim)">
+      CJ01 | Concepto: Antes-Después | TOF | Video | 5.6.26<br>
+      CJ02 | Concepto: Comparación | MOF | Estático | 5.6.26<br>
+      CJ01 | Ángulo: Arrugas | MOF | Video | 5.6.26
+    </p>
+  </div>
+  <h4><span class="n">→</span> Anuncio, variaciones y Post ID</h4>
+  <ul class="li">
+    <li><strong>Anuncio:</strong> <code>AD## | CJ##</code>. Todo lo demás —ángulo, avatar, concepto— <strong>no va en el nombre</strong>: vive en las columnas del tracker. El nombre solo lleva la llave</li>
+    <li><strong>Variaciones:</strong> <code>AD##v# | CJ##</code>. El AD del padre viaja y el v# incrementa, así el linaje del ganador queda a la vista</li>
+    <li><strong>Post ID:</strong> cuando migrás un ganador a escalado, <strong>pasalo con la publicación existente</strong>, no como anuncio nuevo. Conservás toda la prueba social acumulada (reacciones, comentarios, compartidos) y no reiniciás el aprendizaje social</li>
+  </ul>
+  <div class="rule">Regla estructural: <b>dos anuncios nunca comparten exactamente la misma combinación de dimensiones.</b> Cada uno difiere en al menos una.</div>
+</section>
+
+<section class="sec" id="s32" data-t="El tracker de ads">
+  <div class="secno">32</div>
+  <h3>El tracker de ads</h3>
+  <p>Una fila por anuncio. Es la pieza que convierte una cuenta publicitaria en un sistema que aprende. Tres pestañas: base de datos, dashboard y reglas.</p>
+  <h4><span class="n">→</span> Base de datos</h4>
+  <table class="t">
+    <tr><th>Bloque</th><th class="hi">Qué se carga</th></tr>
+    <tr><td><strong>Llave</strong></td><td>ID (AD##-CJ##), que matchea 1:1 con Meta. Fecha</td></tr>
+    <tr><td><strong>Dimensiones</strong></td><td>Ángulo (dolor) · Perspectiva (el argumento) · Concepto · Formato · Avatar · Nivel de conciencia</td></tr>
+    <tr><td><strong>Métricas</strong></td><td>Gasto · Frecuencia · Resultados · CPM · Hook % · CTR · Clics salientes · Tráfico efectivo · Visitas · ATC % · IC % · BUY % · CPA · ROAS · RPM</td></tr>
+    <tr><td><strong>Veredicto</strong></td><td>Ganador / No ganador — lo confirma el humano</td></tr>
+  </table>
+  <h4><span class="n">→</span> Dashboard: lo que te devuelve</h4>
+  <p>Se calcula solo desde la base. Muestra los totales de la cuenta y desglosa el <strong>hit rate, CPA promedio y ROAS promedio por cada dimensión</strong>:</p>
+  <ul class="li">
+    <li><strong>Hit rate por perspectiva</strong> — el argumento. Es la palanca #1</li>
+    <li><strong>Hit rate por concepto</strong> — la ejecución</li>
+    <li>Hit rate por formato, por ángulo, por avatar y por nivel de conciencia</li>
+  </ul>
+  <p>Eso es literalmente lo que te dice qué producir la semana que viene.</p>
+  <h4><span class="n">→</span> Las reglas de decisión</h4>
+  <ol class="num">
+    <li><strong>Inputs del producto:</strong> CPA break-even, piso de gasto para juzgar, dólar del día, ROAS objetivo y ROAS break-even</li>
+    <li><strong>El piso:</strong> un anuncio no se juzga hasta que su gasto llegue a <strong>1× el CPA break-even</strong>. Debajo de eso está "juntando data" y cualquier conclusión es ruido</li>
+    <li><strong>Umbrales por etapa:</strong> TOF se juzga por hook % y CPC · MOF por ATC %, IC % y CPA · BOF por CPA y ROAS</li>
+    <li><strong>Veredictos posibles:</strong> candidato a ganador / candidato a matar / aguantá</li>
+  </ol>
+  <div class="box warn">
+    <div class="k">La regla que más plata salva</div>
+    <p><strong>No mates lo que no gasta. Matá lo que gasta y no pasa los KPIs de su etapa.</strong> Si algo no gasta, el problema es de distribución, no de rendimiento.</p>
+  </div>
+</section>
+
+<section class="sec" id="s33" data-t="Leer el funnel antes de matar">
+  <div class="secno">33</div>
+  <h3>Leer el funnel <span class="hl">antes de matar</span></h3>
+  <p>Cuando algo no funciona, el reflejo es cambiar el creativo. Pero la caída puede estar en cualquiera de cinco puntos, y cada uno se arregla en otro lado.</p>
+  <div class="flow">
+    <div class="s"><div class="t">1</div><div class="n">Hook rate</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">2</div><div class="n">LPV</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">3</div><div class="n">ATC</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">4</div><div class="n">IC</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">5</div><div class="n">Close</div></div>
+  </div>
+  <table class="t">
+    <tr><th>Dónde cae</th><th class="hi">Qué arreglar de verdad</th></tr>
+    <tr><td>Hook rate bajo</td><td>Los primeros 3 segundos. No el producto</td></tr>
+    <tr><td>Hook bien, LPV bajo</td><td>El cierre del anuncio y el CTA</td></tr>
+    <tr><td>LPV bien, ATC bajo</td><td>La landing: congruencia con el ángulo, oferta, precio</td></tr>
+    <tr><td>ATC bien, IC bajo</td><td>El carrito: costos de envío sorpresa, fricción</td></tr>
+    <tr><td>IC bien, Close bajo</td><td>El checkout: medios de pago, confianza, cuotas</td></tr>
+  </table>
+  <div class="rule">El <b>add-to-cart rate</b> es la métrica más importante y la que casi nadie lee. Mirala antes que el ROAS.</div>
+  <h4><span class="n">→</span> Sobre la fase de aprendizaje</h4>
+  <p>Está sobrevalorada como concepto. No es un castigo: es Meta haciendo un efecto cascada (compras → clics → CPM) cuando le falta volumen de señal. Por eso, si mezclás imágenes con videos o tráfico frío con BOF en la misma bolsa, <strong>se comen el presupuesto entre sí.</strong> La solución no es putear a Meta: es <strong>separar por rol y por tipo de señal.</strong></p>
+</section>
+
+<section class="sec" id="s34" data-t="Escalado: los 3 motores">
+  <div class="secno">34</div>
+  <h3>Escalado: los <span class="hl">3 motores</span></h3>
+  <p>El escalado avanzado no es subir presupuesto. Es construir un ecosistema que se actualiza constantemente. Tres motores en paralelo, cada uno con un trabajo distinto.</p>
+  <div class="cards c3">
+    <div class="card lit">
+      <div class="k">Motor 1</div><h5>CBO de renovación</h5>
+      <p><strong>Encuentra.</strong> Abre pools de audiencia nuevos con conceptos nuevos. Acá nacen los ganadores y se sostiene la estabilidad a largo plazo.</p>
+    </div>
+    <div class="card lit">
+      <div class="k">Motor 2</div><h5>Advantage+ de escalado</h5>
+      <p><strong>Estabiliza.</strong> Convierte ganadores en rentabilidad diaria. No tiene fase de aprendizaje: usa el historial de la cuenta. Es la que gestiona el mayor presupuesto.</p>
+    </div>
+    <div class="card lit">
+      <div class="k">Motor 3</div><h5>Pujas de finde y eventos</h5>
+      <p><strong>Acelera.</strong> Bid Cap y Cost Cap para apretar en momentos puntuales y generar picos de facturación.</p>
+    </div>
+  </div>
+  <p>El flujo mental: las CBO de renovación encuentran ganadores nuevos y audiencias nuevas → las Advantage+ los convierten en estabilidad → las pujas dan aceleración cuando el calendario lo justifica.</p>
+  <h4><span class="n">→</span> Reglas de las renovaciones</h4>
+  <ul class="li">
+    <li><strong>1 ad set = 1 buyer.</strong> Cada renovación es una tanda con los conjuntos separados por buyer</li>
+    <li><strong>80% conceptos nuevos / 20% iteración</strong> sobre lo que ya funciona</li>
+    <li>Los ganadores migran a Advantage+ <strong>con Post ID</strong>, conservando la prueba social</li>
+    <li>Decisión de dónde renovar: mismo conjunto da estabilidad, campaña nueva valida data</li>
+  </ul>
+  <div class="box dark">
+    <div class="k">Ejemplo de una operación grande</div>
+    <p><strong>3 renovaciones por semana, 40 anuncios cada una.</strong> Cada renovación: 3 conjuntos de 10 anuncios — 30 de conceptos nuevos y 10 iterando sobre lo que viene funcionando. De ahí salen los high performers que alimentan la Advantage+.</p>
+  </div>
+  <h4><span class="n">→</span> Surfeo y pujas</h4>
+  <ul class="li">
+    <li><strong>Surfeo (vertical):</strong> subir presupuesto solo en campañas <strong>en frío</strong>, con CPA rentable y frecuencia baja, mirando la ventana de 4 días. Si el CPA sube y se sostiene, se vuelve al presupuesto anterior</li>
+    <li><strong>Findes con Bid Cap (ABO):</strong> lanzar el viernes, testear pujas, meter intra-pujas, y surfear sábado y domingo según stock</li>
+    <li><strong>Findes con Cost Cap (CBO):</strong> 3 a 6 conjuntos con costs por debajo del CPA actual</li>
+    <li><strong>Zombie Cost Cap:</strong> revivir ganadores que ya se habían quemado. A veces vuelven con la mitad del CPA anterior</li>
+  </ul>
+  <div class="box warn">
+    <div class="k">Dos advertencias</div>
+    <p><strong>No duplicar para escalar:</strong> satura la misma audiencia y sube la frecuencia. Lo único que trae audiencias nuevas son <strong>conceptos nuevos</strong>.</p>
+    <p>Y ojo con la <strong>prospección que se vuelve retargeting</strong>: si una campaña supuestamente fría levanta frecuencia (2,5 o más), Meta se está encontrando conversiones en gente ya caliente. La solución son las <strong>exclusiones</strong>: excluir compradores, visitantes y add-to-carts para forzar que cumpla su rol.</p>
+  </div>
+</section>
+
+<section class="sec" id="s35" data-t="La cuenta de renovación">
+  <div class="secno">35</div>
+  <h3>La cuenta de renovación</h3>
+  <p>Cuántos creativos necesitás <strong>no se decide a ojo.</strong> Sale de tu velocidad de fatiga y de tu hit rate real.</p>
+  <h4><span class="n">Paso 1</span> Calculá tu hit rate</h4>
+  <div class="rule">Hit rate = <b>anuncios ganadores ÷ anuncios totales lanzados</b></div>
+  <p>Si de 100 anuncios pegaron 10, tenés 10%. Si de 8 pegaron 1, tenés 12,5%. Este número se vuelve confiable recién con historial: <strong>después de 250 creativos tenés una tasa mucho más certera</strong> que en tu primera tanda.</p>
+  <h4><span class="n">Paso 2</span> Cuántos ganadores activos necesitás</h4>
+  <div class="rule">Winners = <b>spend objetivo ÷ spend útil por winner</b></div>
+  <p>El "spend útil" es cuánto aguanta un creativo tuyo por día antes de que el CPA empiece a subir. Sale de mirar tus ganadores anteriores.</p>
+  <div class="stats c3">
+    <div class="stat"><div class="v">$300</div><div class="k">Spend objetivo diario</div></div>
+    <div class="stat"><div class="v">$60</div><div class="k">Spend útil por winner</div></div>
+    <div class="stat"><div class="v">5</div><div class="k">Winners activos necesarios</div></div>
+  </div>
+  <h4><span class="n">Paso 3</span> Cuántos anuncios lanzar</h4>
+  <div class="rule">Anuncios a lanzar = <b>winners ÷ hit rate</b></div>
+  <div class="stats c3">
+    <div class="stat"><div class="v">5</div><div class="k">Winners necesarios</div></div>
+    <div class="stat"><div class="v">10%</div><div class="k">Hit rate real</div></div>
+    <div class="stat"><div class="v">50</div><div class="k">Anuncios a lanzar</div></div>
+  </div>
+  <p><strong>Ese número es tu plan de producción.</strong> Y si querés que baje, hay dos palancas: subir el hit rate (producir mejor, ir más profundo en vez de más ancho) o subir el spend útil por winner.</p>
+  <div class="box">
+    <div class="k">La matemática de mejorar el hit rate</div>
+    <table class="t" style="margin:8px 0 0">
+      <tr><th>Hit rate</th><th>Creativos lanzados</th><th class="hi">Ganadores</th></tr>
+      <tr><td>5%</td><td>20</td><td>1</td></tr>
+      <tr><td><strong>10%</strong> (calidad sobre volumen)</td><td>Los mismos 20</td><td><strong>2</strong></td></tr>
+    </table>
+  </div>
+  <div class="box warn">
+    <div class="k">Cuándo dejar de ir más ancho</div>
+    <p>Si testeás 400 anuncios por mes y escalan dos, el problema no es que produzcas poco: <strong>es que producís sin intención.</strong> Ir más profundo —agarrar el concepto que ya dio ganador y explorarlo en tres ángulos, dos formatos y cuatro hooks— sube el hit rate más que sumar diez conceptos al azar.</p>
+  </div>
+</section>
+
+<!-- ══════ PARTE 7 — RETENCIÓN Y LTV ══════ -->
+<section class="part" id="p7" data-part="Retención y LTV">
+  <div class="partno">07</div>
+  <div class="partk">Parte 7</div>
+  <h2>Retención y LTV</h2>
+  <p class="pd">La parte del negocio que no depende de la pauta, que no se quema, y que define cuánto podés pagar por cada cliente nuevo.</p>
+</section>
+
+<section class="sec" id="s36" data-t="Por qué el LTV es la métrica madre">
+  <div class="secno">36</div>
+  <h3>Por qué el LTV es la <span class="hl">métrica madre</span></h3>
+  <p>Todo lo que hiciste en las partes anteriores sirve para adquirir un cliente. Esta parte decide cuánto vale ese cliente — y por lo tanto, cuánto podías haber pagado por él.</p>
+  <div class="chain">
+    <div class="step"><span class="sn">→</span><span>Más <strong>LTV</strong></span></div>
+    <div class="step"><span class="sn">→</span><span>Más <strong>CPA</strong> que podés pagar</span></div>
+    <div class="step"><span class="sn">→</span><span>Más <strong>agresivo</strong> podés ser adquiriendo</span></div>
+    <div class="step hot"><span class="sn">→</span><span>Le <strong>ganás la subasta</strong> a tu competencia — y tu base de clientes crece más rápido</span></div>
+  </div>
+  <p>Objetivo de referencia: que un cliente se quede <strong>al menos 3 meses, idealmente 4 o más.</strong> Si tu LTV es alto, estás haciendo algo bien.</p>
+</section>
+
+<section class="sec" id="s37" data-t="Los 4 flujos de email">
+  <div class="secno">37</div>
+  <h3>Los <span class="hl">4 flujos</span> de email</h3>
+  <p>La mayoría de las marcas chicas tienen la herramienta instalada y usan solo el welcome básico. Le están regalando entre un 20 y un 40% de la facturación a la competencia.</p>
+  <div class="cards c4">
+    <div class="card">
+      <div class="k">Flujo 1</div><h5>Bienvenida</h5>
+      <p>Pop-up de captura con incentivo + secuencia de 5 a 7 emails que cierra al que no compró: historia de marca, FAQ, prueba social, urgencia.</p>
+    </div>
+    <div class="card lit">
+      <div class="k">Flujo 2 · el más fuerte</div><h5>Checkout abandonado</h5>
+      <p>Dejó el email y no compró. 3 emails en 24-48 hs con descuento progresivo. <strong>La mayoría cierra acá.</strong></p>
+    </div>
+    <div class="card">
+      <div class="k">Flujo 3</div><h5>Carrito abandonado</h5>
+      <p>Estructura paralela, con filtros para no duplicar con el anterior.</p>
+    </div>
+    <div class="card">
+      <div class="k">Flujo 4</div><h5>Post-compra</h5>
+      <p>Gracias, educación de uso, pedido de review, cross-sell, comunidad y <strong>recompra a 30 días</strong> si es consumible.</p>
+    </div>
+  </div>
+  <div class="rule">En un consumible típico, los cuatro flujos pueden representar entre el <b>20 y el 40% de la facturación</b>. No dependen de la pauta y no se queman.</div>
+  <h4><span class="n">→</span> Campañas a clientes actuales</h4>
+  <p>Un error frecuente es correr campañas solo para tráfico frío. <strong>Armá segmentos y corré campañas específicas para clientes actuales.</strong> Ya te compraron, ya confían, y el costo de impactarlos es cero.</p>
+  <div class="box warn">
+    <div class="k">La advertencia sobre email</div>
+    <p><strong>La mayor parte del churn viene de spamear de más.</strong> Mucha gente manda campaña tras campaña y termina generando cancelaciones y bajas de lista. Menos campañas, mejores flujos.</p>
+  </div>
+</section>
+
+<section class="sec" id="s38" data-t="Las 4 palancas de retención">
+  <div class="secno">38</div>
+  <h3>Las 4 palancas de retención</h3>
+  <div class="cards c4">
+    <div class="card lit"><div class="k">Palanca 1</div><h5>Roadmap de incentivos</h5><p>Beneficios que crecen con la permanencia. Una razón concreta para llegar al mes 4.</p></div>
+    <div class="card lit"><div class="k">Palanca 2</div><h5>Emails sin spam</h5><p>Frecuencia cuidada. El exceso es la causa principal de bajas.</p></div>
+    <div class="card lit"><div class="k">Palanca 3</div><h5>Timeline realista</h5><p>Si prometés resultados en 7 días y el producto tarda 60, garantizaste la cancelación.</p></div>
+    <div class="card lit"><div class="k">Palanca 4</div><h5>Hábito y comunidad</h5><p>No entregar el producto solo porque te pagaron. Construir el hábito de usarlo.</p></div>
+  </div>
+  <p>Sobre el timeline: es especialmente crítico en suplementos y consumibles. Mucha gente promete resolución en 7 a 15 días cuando el beneficio real requiere sostener el uso durante meses. <strong>Prometer corto y entregar largo es la fórmula exacta del churn.</strong></p>
+  <div class="box">
+    <div class="k">La paciencia que exige</div>
+    <p>La retención es <strong>una fase de testeo infinita.</strong> Hay que esperar uno, dos o tres meses para que entren las cohortes y llegue la data. La solución práctica: construir un roadmap de qué se va a testear y en qué orden, para poder delegarlo y no improvisar cada mes.</p>
+  </div>
+  <p>Y una pieza que casi nadie monta: un <strong>flow de cancelación con encuesta de feedback</strong>. Es research gratis sobre exactamente por qué se van.</p>
+</section>
+
+<section class="sec" id="s39" data-t="Mejora de producto y ecosistema">
+  <div class="secno">39</div>
+  <h3>Mejora de producto y <span class="hl">ecosistema</span></h3>
+  <p>Acá está el sesgo más caro de la industria: pensar solo en adquisición, creativo y primer cliente. <strong>En un negocio con recompra, el producto lo es todo</strong>, porque todo depende de que el cliente vuelva.</p>
+  <ul class="li">
+    <li><strong>Mejora trimestral agendada</strong> — packaging, fórmula, formato, experiencia de unboxing. Si vendés en plataformas donde las reseñas son públicas, no hay dónde esconderse</li>
+    <li><strong>Ecosistema alrededor del hero SKU</strong> — consumibles complementarios que se emparejan naturalmente. Si alguien compra creatina, probablemente usa proteína</li>
+    <li><strong>Ruta clara de productos</strong> — cuanto más obvio es el siguiente paso, más LTV</li>
+  </ul>
+  <div class="rule">La relación con la fábrica es <b>apalancamiento</b>, no un trámite. Mejor producto = mejor LTV = podés pujar más alto en la subasta = superás a tu competencia en escala.</div>
+</section>
+
+<section class="sec" id="s40" data-t="Multicanal">
+  <div class="secno">40</div>
+  <h3>Multicanal</h3>
+  <p>Más canales significa más puntos de contacto con la misma persona, y eso sube el LTV. Y más LTV significa que podés tolerar un CPA más alto que tu competencia.</p>
+  <div class="flow">
+    <div class="s lit"><div class="t">Base</div><div class="n">Meta Ads</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">Segundo</div><div class="n">Mercado Libre</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">Tercero</div><div class="n">TikTok</div></div>
+    <div class="a">→</div>
+    <div class="s"><div class="t">Cuarto</div><div class="n">Google / YouTube</div></div>
+  </div>
+  <table class="t">
+    <tr><th>Canal</th><th class="hi">Rol y observaciones</th></tr>
+    <tr><td><strong>Tienda propia + Meta</strong></td><td>La base. Con la web bien hecha y pauta empezás a vender, y desde ahí diversificás</td></tr>
+    <tr><td><strong>Mercado Libre</strong></td><td>Para la gente que no se anima a comprar en tienda online. Ojo: <strong>quien compra en ML es cliente de ML, no tuyo</strong></td></tr>
+    <tr><td><strong>TikTok</strong></td><td>Muy fuerte como canal de arriba del funnel. Se abre replicando los conceptos que ya ganaron en Meta, con CPMs más bajos. Y el orgánico con UGC rinde mucho</td></tr>
+    <tr><td><strong>Google / YouTube</strong></td><td>Canal de intención. Suele venir después, cuando la marca ya tiene búsqueda propia</td></tr>
+  </table>
+  <div class="box warn">
+    <div class="k">Un error de orden</div>
+    <p>Empezar por Mercado Libre sin Meta Ads no se recomienda. Sin tracción competís contra importadoras con costos absurdos y sos un revendedor más. <strong>Sin marca es muy difícil.</strong> La gente elige la publicación con mejores reseñas y mejor precio, sin saber a quién le está comprando.</p>
+  </div>
+</section>
+
+<!-- ══════ PARTE 8 — OPERACIÓN Y FINANZAS ══════ -->
+<section class="part" id="p8" data-part="Operación y finanzas">
+  <div class="partno">08</div>
+  <div class="partk">Parte 8</div>
+  <h2>Operación y finanzas</h2>
+  <p class="pd">La parte que nadie muestra en redes y la que más marcas mata. Podés tener los mejores anuncios del mundo: si la operación no acompaña, te aplasta el negocio.</p>
+</section>
+
+<section class="sec" id="s41" data-t="Elegir proveedor según tu etapa">
+  <div class="secno">41</div>
+  <h3>Elegir proveedor <span class="hl">según tu etapa</span></h3>
+  <p>No hay un proveedor "mejor". Hay trade-offs, y la elección correcta depende de tu capital y tu momento.</p>
+  <table class="t">
+    <tr><th>Tipo</th><th>Cuándo conviene</th><th class="hi">Trade-off</th></tr>
+    <tr><td><strong>Mayoristas locales</strong><br><span class="faint">(Once, Flores)</span></td><td>Para arrancar sin capital. Stock inmediato, sin mínimos. Vendés hoy, comprás mañana, despachás</td><td>Productos commodity muy competidos, calidad inconsistente, sin marca a largo plazo</td></tr>
+    <tr><td><strong>Importación por avión</strong></td><td>Testeo rápido. 50-100 unidades, ~10 días hábiles</td><td>Solo productos livianos (&lt;300 g) y poco voluminosos. Se paga por peso y volumen</td></tr>
+    <tr><td><strong>Importación por barco</strong></td><td>Margen y escala. Cuando ya vendés y podés planificar</td><td>2 a 3 meses de lead time. Obliga a proyectar stock a 90 días. Requiere caja</td></tr>
+    <tr><td><strong>Fabricante local</strong></td><td>Construir marca en serio, con control y todo en blanco</td><td>MOQs altos (ej. 1000 unidades en químicos), costos altos, lead times largos la primera vez</td></tr>
+  </table>
+  <h4><span class="n">→</span> Los 3 caminos según tu capital</h4>
+  <ol class="num">
+    <li><strong>Validación rápida</strong> ($200-800 de pauta) — proveedor con stock local. Vendés, comprás, despachás. Te apalancás en las propias ventas para comprar el stock siguiente. El objetivo es validar rápido sin capital</li>
+    <li><strong>Importación estándar</strong> — testeos más fuertes, y apenas validás, una importación aérea de buena cantidad para mejorar márgenes y despachar al día. Ciclo más largo pero más rentable y más apuntado a marca</li>
+    <li><strong>Marca desde el arranque</strong> — fabricación local o barco, con capital de entrada. Barrera de entrada altísima contra competidores</li>
+  </ol>
+  <div class="box warn">
+    <div class="k">La regla transversal</div>
+    <p>En casi todos los casos: <strong>primero validá el producto.</strong> Recién con validación y liquidez, mandá a fabricar o hacé el pedido grande. Si te traés 2000 unidades sin validar, te clavaste con 2000 unidades.</p>
+  </div>
+  <div class="box dark">
+    <div class="k">Un caso real que vale más que la teoría</div>
+    <p>Un secador de ropa portátil se vendía muy bien y prácticamente sin competencia — voluminoso, pesado, difícil de traer. Se quedó sin stock, el abastecimiento venía por barco, y <strong>no había liquidez para hacer el pedido de reposición. Hubo que matar la marca.</strong> El producto funcionaba. La operación no.</p>
+  </div>
+  <h4><span class="n">→</span> El agente y la fábrica</h4>
+  <p>Una jugada de apalancamiento que casi nadie hace: <strong>cortar al agente en el producto.</strong> Ir directo a la fábrica, conseguir el contacto, construir la relación. Así el agente deja de ganar margen sobre el producto y queda solo como logística.</p>
+  <p>Alcanzado el proof of concept, la relación con la fábrica se vuelve una fuente de ventaja real: <strong>payment terms, mejora de producto, prioridad de producción.</strong> Todo el mundo piensa que el creativo es la única forma de escalar, y hay apalancamiento en lugares donde nadie está mirando.</p>
+</section>
+
+<section class="sec" id="s42" data-t="Cash flow: el oxígeno">
+  <div class="secno">42</div>
+  <h3>Cash flow: <span class="hl">el oxígeno</span></h3>
+  <p>Se puede tener un mes récord de facturación y fundirse. Pasa todo el tiempo, y pasa porque el cash flow es un sistema aparte de la rentabilidad.</p>
+  <h4><span class="n">→</span> El ciclo de conversión de caja</h4>
+  <p>La pregunta que hay que resolver: <strong>¿cómo mantengo el dinero el mayor tiempo posible en la cuenta del negocio y pago lo más tarde posible?</strong> Los dos gastos más grandes del e-commerce son la pauta y el inventario.</p>
+  <ul class="li">
+    <li><strong>Payment terms con proveedores</strong> — la palanca más grande y la menos usada</li>
+    <li><strong>Líneas de crédito</strong> con proveedores</li>
+    <li><strong>Tarjetas de crédito</strong>, rotándolas si hace falta</li>
+    <li><strong>Acreditación</strong> — a menos caja, priorizá liquidez aunque cueste comisión; a más caja, optimizá márgenes</li>
+  </ul>
+  <p>Bien afinado, se puede adquirir un cliente el día uno y recién pagar por ese cliente el día 75 o 100. <strong>Eso es lo que permite escalar más rápido que un competidor con el mismo margen.</strong></p>
+  <div class="box warn">
+    <div class="k">Disclaimer necesario</div>
+    <p>Esto no es consejo financiero. Requiere entender el cash flow y ser bueno gestionando plata. <strong>Si no te sentís cómodo con la deuda, trabajá con el cash que tenés</strong> — es una decisión legítima y mucha gente escala así.</p>
+  </div>
+  <h4><span class="n">→</span> Las reglas de caja</h4>
+  <ol class="num">
+    <li><strong>Manejá bien las cuotas.</strong> Ofrecelas cuando la conversión lo justifique; con ticket bajo, evaluá sacarlas para ganar margen</li>
+    <li><strong>Coordiná plazos.</strong> Los plazos de cobro tienen que coordinarse con los plazos de entrega del proveedor, o te quedás sin stock y sin caja al mismo tiempo</li>
+    <li><strong>La regla de oro:</strong> no retires plata hasta que el negocio haya pagado su próxima vuelta — stock, pauta, logística, comisiones, impuestos, caja y crecimiento</li>
+    <li><strong>Reinvertí en la fase inicial.</strong> Retirá lo mínimo posible. Si podés vivir de otra fuente, reinvertí cada peso</li>
+    <li><strong>Pensá en productos, no en plata.</strong> La reinversión no es un número abstracto: es cuántas unidades más podés tener en stock</li>
+  </ol>
+  <div class="rule">Sin backup de caja, <b>dos o tres días malos matan un negocio</b> que estaba vendiendo bien.</div>
+</section>
+
+<section class="sec" id="s43" data-t="Proyección de stock y gestión de escala">
+  <div class="secno">43</div>
+  <h3>Proyección de stock y gestión de escala</h3>
+  <p>El proveedor es la base de la escalabilidad. Podés tener campañas listas para escalar y no poder hacerlo porque no hay con qué despachar.</p>
+  <h4><span class="n">→</span> Cómo se proyecta</h4>
+  <ol class="num">
+    <li><strong>Datos iniciales:</strong> stock actual, fecha y cantidad de las entregas confirmadas del proveedor</li>
+    <li><strong>Ventas por día</strong> proyectadas según el framework de lanzamiento</li>
+    <li><strong>Escalado progresivo:</strong> se suman las renovaciones y el aumento de presupuesto planificado</li>
+    <li><strong>Días en negativo:</strong> la planilla te muestra en qué fecha te quedás sin stock. <strong>Ese es el número que ordena todo lo demás</strong></li>
+  </ol>
+  <p>Como referencia de horizonte: proyectá <strong>90 días hacia adelante</strong> como base, y a medida que suba la liquidez, 6 meses. Si te quedás sin stock con importación por barco, te comés 2 o 3 meses sin ventas aunque los anuncios estén corriendo.</p>
+  <div class="box">
+    <div class="k">Escalado progresivo con equipo</div>
+    <p>Una mecánica que funciona: acumular anuncios sin lanzarlos. Estuviste una semana con 35 pedidos diarios armando creativos. Llega el martes, tenés 40 anuncios acumulados, metés una escala de $150 y saltás a 50 pedidos. Y durante esos días de 50, <strong>ya estás preparando la renovación siguiente.</strong> Y así.</p>
+  </div>
+  <div class="box warn">
+    <div class="k">Lo más importante de la gestión de escala</div>
+    <p><strong>Saber cómo te puede abastecer el proveedor.</strong> Puede pasar que escales, vendas de más y no tengas stock: el proveedor promete, se atrasa, y no cumple. Llevá una escala tranquila hasta que veas cómo trabaja realmente.</p>
+  </div>
+</section>
+
+<section class="sec" id="s44" data-t="Importación: los conceptos que importan">
+  <div class="secno">44</div>
+  <h3>Importación: los conceptos <span class="hl">que importan</span></h3>
+  <p>No hace falta ser despachante de aduana. Hace falta entender qué pasa detrás para <strong>reducir costos, aumentar márgenes y no quedarte sin stock.</strong></p>
+  <table class="t">
+    <tr><th>Concepto</th><th class="hi">Qué significa</th></tr>
+    <tr><td><strong>Incoterms</strong></td><td>EXW, FOB y CIF definen hasta dónde llega la responsabilidad del vendedor. El CIF es clave porque sobre él se calculan los impuestos</td></tr>
+    <tr><td><strong>Peso volumétrico</strong></td><td>Se paga por peso <em>o</em> por volumen, lo que sea mayor. Un producto liviano pero voluminoso puede costar más de flete que uno pesado y compacto</td></tr>
+    <tr><td><strong>Avión vs. barco</strong></td><td>Avión: ~10 días, para testeo y poco volumen, ~15 USD/kg. Barco: 2-3 meses, mucho más barato por unidad, para volumen</td></tr>
+    <tr><td><strong>Intervenciones</strong></td><td>Ciertos productos requieren autorizaciones especiales. Chequearlo <strong>antes</strong> de comprar, no después</td></tr>
+  </table>
+  <p>Importar es un <strong>trabajo de planificación.</strong> A diferencia del mayorista local —donde podés vender primero y comprar después— acá hacés una inversión y esperás 10 días o 3 meses sin tener la mercadería.</p>
+  <div class="rule">El costo final puesto en Argentina no es solo lo que sale el producto en China. <b>El flete y los impuestos pesan muchísimo</b>, y ahí es donde se trabaja para bajar el costo unitario.</div>
+  <div class="box">
+    <div class="k">Hacerlo bien desde el principio</div>
+    <p>Todo facturado, con comprobantes, sin agujeros fiscales. No porque sea lo correcto solamente: porque <strong>define cuánto te dura el negocio</strong> y si el día de mañana podés venderlo, escalarlo o dormir tranquilo.</p>
+  </div>
+</section>
+
+<!-- ══════ PARTE 9 — EQUIPO Y SISTEMA ══════ -->
+<section class="part" id="p9" data-part="Equipo y sistema">
+  <div class="partno">09</div>
+  <div class="partk">Parte 9</div>
+  <h2>Equipo y sistema</h2>
+  <p class="pd">Lo que convierte todo lo anterior en algo que funciona sin que vos estés en cada engranaje. Es la diferencia entre tener un negocio y tener un trabajo muy demandante.</p>
+</section>
+
+<section class="sec" id="s45" data-t="Trabajo operativo vs. trabajo de crecimiento">
+  <div class="secno">45</div>
+  <h3>Operativo vs. <span class="hl">crecimiento</span></h3>
+  <p>Hay dos tipos de trabajo, y confundirlos es lo que mantiene a la mayoría estancada.</p>
+  <div class="cards c2">
+    <div class="card">
+      <div class="k">Trabajo operativo</div>
+      <h5>Mantiene el negocio andando</h5>
+      <p>Contestar WhatsApp y correos, despachar, cargar seguimientos, resolver incidencias. <strong>Necesario, pero cero apalancado.</strong> Consume el día entero.</p>
+    </div>
+    <div class="card lit">
+      <div class="k">Trabajo de crecimiento</div>
+      <h5>Mueve el techo</h5>
+      <p>Estrategia creativa, gestión de campañas, mejora de producto, decisiones de negocio, construir sistemas. <strong>Es lo único que cambia la escala.</strong></p>
+    </div>
+  </div>
+  <p>Un reparto típico de un dueño que escaló: se queda muy metido en <strong>media buying</strong> (estrategia creativa y gestión de campañas), porque no lleva tanto tiempo y tiene el mayor apalancamiento. Y delega atención al cliente, proceso logístico, contaduría, producción creativa y testeo de landings.</p>
+</section>
+
+<section class="sec" id="s46" data-t="Cómo delegar de verdad">
+  <div class="secno">46</div>
+  <h3>Cómo delegar <span class="hl">de verdad</span></h3>
+  <p>Delegar no es contratar y esperar. Es documentar primero.</p>
+  <ol class="num">
+    <li><strong>Documentá mientras lo hacés vos.</strong> Cada vez que resolvés algo repetitivo, escribilo: llega este mensaje, se responde así; pasa esto, se hace lo otro. Un documento o un video de pantalla</li>
+    <li><strong>Cuando delegás, entregás el documento.</strong> Una llamada de explicación, el proceso escrito, y la persona arranca</li>
+    <li><strong>Empezá por lo que más tiempo te come</strong> — casi siempre es atención al cliente</li>
+    <li><strong>Iterá el documento con la persona</strong> que lo ejecuta. Ella va a encontrar los casos que vos no anticipaste</li>
+  </ol>
+  <div class="box">
+    <div class="k">Sobre atención al cliente</div>
+    <p>No conviene automatizarla del todo. <strong>Lo que mejor funciona es atención humana con macros</strong> — respuestas preparadas para los casos frecuentes, con una persona decidiendo cuál usar y ajustándola.</p>
+  </div>
+  <h4><span class="n">→</span> A quién contratar primero, según tu data</h4>
+  <p>Acá el tracker vuelve a pagar: te dice qué tipo de creativo produce tus ganadores.</p>
+  <table class="t">
+    <tr><th>Si tu hit rate viene de…</th><th class="hi">Contratás…</th></tr>
+    <tr><td>Creativos estáticos</td><td>Un diseñador que haga las renovaciones de estáticos</td></tr>
+    <tr><td>B-roll editado</td><td>Un editor de video</td></tr>
+    <tr><td>UGC con IA</td><td>Alguien dedicado a producción con IA</td></tr>
+    <tr><td>UGC humano</td><td>Gestión de creadores + un editor</td></tr>
+  </table>
+  <div class="rule">Si necesitás <b>20 a 30 creativos por día</b>, no los vas a hacer vos. Y no deberías: es una tarea cero apalancada. La idea es crear el <b>proceso</b> de cómo se hacen los ganadores, para que otro lo replique.</div>
+  <div class="box warn">
+    <div class="k">El equipo como apalancamiento</div>
+    <p>El equipo es una fuente de ventaja muy subestimada, y funciona cuando está bien incentivado. Un editor que puede ganar bien trabajando con vos tiene una razón para mejorar. <strong>Incentivar al equipo no es un gasto: es lo que hace que el sistema mejore solo.</strong></p>
+  </div>
+</section>
+
+<section class="sec" id="s47" data-t="El ciclo semanal">
+  <div class="secno">47</div>
+  <h3>El ciclo semanal</h3>
+  <p>El sistema no es un proyecto: es una rutina. Así se ve una semana operando bien.</p>
+  <table class="t">
+    <tr><th>Día</th><th>Bloque</th><th class="hi">Output</th></tr>
+    <tr><td><strong>Lunes</strong></td><td>Lectura del tracker: qué ganó, qué murió, hit rate por dimensión</td><td>Decisión de qué producir</td></tr>
+    <tr><td><strong>Martes</strong></td><td>Ideación: conceptos nuevos + selección de ángulos, motivadores y hooks desde el research</td><td>Briefs listos</td></tr>
+    <tr><td><strong>Miércoles</strong></td><td>Producción: filmación, UGC, IA, estáticos</td><td>Material crudo</td></tr>
+    <tr><td><strong>Jueves</strong></td><td>Edición y multiplicación por la matriz. Nomenclatura aplicada</td><td>Piezas finales</td></tr>
+    <tr><td><strong>Viernes</strong></td><td>Carga y lanzamiento. Pujas de finde si corresponde</td><td>Campañas al aire</td></tr>
+    <tr><td><strong>Fin de semana</strong></td><td>Corre solo. Se mira, no se toca</td><td>Datos</td></tr>
+  </table>
+  <p>Y en paralelo, con otra cadencia: <strong>revisión de stock y caja semanal</strong>, <strong>revisión de cohortes y retención mensual</strong>, y <strong>mejora de producto trimestral.</strong></p>
+  <div class="rule">La clave del ciclo: <b>los ganadores pasan a escala mientras los anteriores todavía funcionan.</b> Nunca se produce por pánico.</div>
+</section>
+
+<section class="sec" id="s48" data-t="La matriz de producción">
+  <div class="secno">48</div>
+  <h3>La matriz de producción</h3>
+  <p>Cómo se llega a volumen sin inventar cien ideas. La distinción de vocabulario primero, porque es donde todos se confunden:</p>
+  <table class="t">
+    <tr><th>Término</th><th>Qué es</th><th class="hi">Por semana</th></tr>
+    <tr><td><strong>Concepto nuevo</strong></td><td>Una idea narrativa original</td><td>5 a 10</td></tr>
+    <tr><td><strong>Pieza / asset</strong></td><td>Cada archivo que sube a la cuenta</td><td>100 o más</td></tr>
+  </table>
+  <div class="flow">
+    <div class="s"><div class="t">A</div><div class="n">Conceptos<br>5</div></div>
+    <div class="a">×</div>
+    <div class="s"><div class="t">B</div><div class="n">Formatos<br>3</div></div>
+    <div class="a">×</div>
+    <div class="s"><div class="t">C</div><div class="n">Ángulos<br>2</div></div>
+    <div class="a">×</div>
+    <div class="s"><div class="t">D</div><div class="n">Hooks<br>4</div></div>
+    <div class="a">=</div>
+    <div class="s lit"><div class="t">Total</div><div class="n">120<br>piezas</div></div>
+  </div>
+  <p>Cinco ideas originales, ciento veinte piezas. Y como cada pieza está etiquetada por concepto, formato, ángulo y hook, <strong>cada una devuelve información cruzada</strong> sobre qué dimensión mueve la aguja en tu marca.</p>
+  <div class="box">
+    <div class="k">Las palancas más baratas de multiplicación</div>
+    <ul class="li">
+      <li><strong>El hook</strong> — cambiar los primeros 3 segundos no requiere volver a filmar. La variación más rentable que existe</li>
+      <li><strong>El motivador</strong> — se cambia en el copy y el texto en pantalla</li>
+      <li><strong>El corte</strong> — el mismo material en 15, 30 y 45 segundos son tres piezas</li>
+      <li><strong>El formato de salida</strong> — vertical, cuadrado, con y sin subtítulos</li>
+    </ul>
+  </div>
+  <div class="box warn">
+    <div class="k">La advertencia</div>
+    <p>El volumen sin intención no sirve. Cien piezas de cinco conceptos bien elegidos rinden; cien piezas de cinco conceptos al azar solo queman plata más rápido. <strong>La matriz multiplica lo que le pongas adentro, para bien y para mal.</strong></p>
+  </div>
+</section>
+
+<!-- ══════ CIERRE ══════ -->
+<section class="part" id="p10" data-part="Plan de acción">
+  <div class="partno">10</div>
+  <div class="partk">Para cerrar</div>
+  <h2>El plan de <span class="hl">90 días</span></h2>
+  <p class="pd">Todo lo anterior, en orden ejecutable. Cada bloque asume el anterior terminado.</p>
+</section>
+
+<section class="sec" id="s49" data-t="El plan de 90 días">
+  <div class="secno">49</div>
+  <h3>El plan, bloque por bloque</h3>
+  <table class="t">
+    <tr><th>Bloque</th><th>Qué hacés</th><th class="hi">Cómo sabés que está listo</th></tr>
+    <tr><td class="v">Días<br>1-15</td><td><strong>Fundaciones.</strong> Validá el producto con el filtro GO/NO-GO. Hacé el research con 100+ frases reales. Calculá el costeo completo</td><td>Tenés un GO, una lista de ángulos reales y tu CPA break-even en pesos</td></tr>
+    <tr><td class="v">Días<br>16-30</td><td><strong>Marca y oferta.</strong> Naming verificado en los 3 frentes, brandboard, arquitectura de oferta con offer stack, bundles y cross-sells</td><td>Tenés identidad definida y la cuenta de la oferta cierra con margen</td></tr>
+    <tr><td class="v">Días<br>31-45</td><td><strong>Tienda y funnel.</strong> Página de producto completa, landing por ángulo, checkout sin fricción, apps, los 4 flujos de email</td><td>Pasaste la checklist de pre-lanzamiento entera desde el celular</td></tr>
+    <tr><td class="v">Días<br>46-60</td><td><strong>Primer testeo.</strong> Nomenclatura, tracker vacío, 5 conceptos, ABO con purga, broad</td><td>Las campañas están al aire y cada anuncio es una fila cargada</td></tr>
+    <tr><td class="v">Días<br>61-75</td><td><strong>Lectura y decisión.</strong> Umbrales por etapa, funnel completo, ganadores a escalado con Post ID. Calculá tu hit rate</td><td>Sabés tu hit rate y cuántos anuncios necesitás por semana</td></tr>
+    <tr><td class="v">Días<br>76-90</td><td><strong>Sistema.</strong> Ciclo semanal corriendo, proyección de stock, primera delegación documentada</td><td>La semana funciona sin que vos toques cada engranaje</td></tr>
+  </table>
+  <div class="rule">A partir del día 90 esto deja de ser un plan y pasa a ser <b>la operación</b>. Ahí ya tenés un negocio, no una racha.</div>
+</section>
+
+<section class="sec" id="s50" data-t="Checklist maestro">
+  <div class="secno">50</div>
+  <h3>Checklist maestro</h3>
+  <p>Los 20 puntos que definen si tenés un sistema o una serie de tácticas sueltas.</p>
+  <div class="check">
+    <div><span>Sé mi <strong>CPA break-even</strong> en pesos, con todos los costos descontados</span></div>
+    <div><span>Mi producto pasa los criterios: dolor específico, mecanismo único, markup, recompra</span></div>
+    <div><span>Validé con <strong>data antes de gastar</strong>, no con corazonada</span></div>
+    <div><span>Tengo <strong>100+ frases textuales</strong> de clientes reales y ángulos que salen de ahí</span></div>
+    <div><span>Mi oferta tiene <strong>offer stack, bundles y cross-sells</strong> costeados</span></div>
+    <div><span>Mi posicionamiento está definido y <strong>no compito por ser el más barato</strong></span></div>
+    <div><span>Hay <strong>coherencia visual</strong> entre anuncios, tienda, feed y emails</span></div>
+    <div><span>Cada ángulo tiene su <strong>landing congruente</strong></span></div>
+    <div><span>La tienda está revisada <strong>desde el celular</strong>, punto por punto</span></div>
+    <div><span>El pixel mide los 4 eventos y pasé la <strong>checklist de pre-lanzamiento</strong></span></div>
+    <div><span>Testeo <strong>conceptos distintos</strong>, no variaciones del mismo anuncio</span></div>
+    <div><span>Uso <strong>ABO para testear</strong> y Advantage+ para escalar. Corro broad</span></div>
+    <div><span>Tengo <strong>nomenclatura</strong> en campaña, conjunto y anuncio, idéntica al tracker</span></div>
+    <div><span>Tengo un <strong>tracker</strong> con una fila por anuncio y sé mi hit rate real</span></div>
+    <div><span><strong>No mato lo que no gasta</strong>, y leo el funnel completo antes de decidir</span></div>
+    <div><span>Los <strong>4 flujos de email</strong> están corriendo</span></div>
+    <div><span>Tengo una <strong>proyección de stock</strong> a 90 días y un proveedor de respaldo</span></div>
+    <div><span>No retiro plata hasta que el negocio <strong>pagó su próxima vuelta</strong></span></div>
+    <div><span>Tengo <strong>procesos documentados</strong> de al menos una tarea delegable</span></div>
+    <div><span>Hay <strong>reemplazos creativos listos</strong> antes de que muera el ganador</span></div>
+  </div>
+</section>
+
+<section class="sec" id="s51" data-t="Lo único que hay que recordar">
+  <div class="secno">51</div>
+  <h3>Lo único que hay que recordar</h3>
+  <p>Si te olvidás de las cincuenta páginas anteriores, quedate con esto.</p>
+  <div class="quote">La diferencia entre el e-commerce que dura tres meses<br>y el que dura tres años no es el producto que encontró.<br><span class="hl">Es la cantidad de sistemas que tiene montados.</span></div>
+  <p>Un ganador es una racha. Un sistema es un negocio. Y lo segundo no depende de tener talento ni suerte: <strong>depende de resolver las cosas en orden, medirlas, y sostenerlas todas las semanas.</strong></p>
+  <p>Eso se puede aprender. Y se puede empezar hoy.</p>
+</section>
+
+</main>
+
+<footer>
+  <span class="brand" style="font-size:20px"><span class="sun"></span>Genesis<span class="os">OS</span></span>
+  <p>El Playbook Operativo · Manu Domínguez · E-commerce Argentina</p>
+</footer>
+
+<script>
+const COVER=`<div class="pgin" style="padding:32px 28px">
+<div style="display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:800;font-size:14px;letter-spacing:-.02em">
+<span style="width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#FFC48A,#FF6A1A 65%,#D8500A);box-shadow:0 0 14px rgba(255,106,26,.6)"></span>
+Genesis<span style="color:var(--accent);font-size:.62em;transform:translateY(2px)">OS</span></div>
+<div style="font-family:var(--mono);font-size:7.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);margin:34px 0 12px">Playbook · 50 páginas</div>
+<div style="font-family:var(--display);font-weight:800;font-size:34px;line-height:.93;letter-spacing:-.035em">El Playbook<br><span style="color:var(--accent)">Operativo</span></div>
+<div style="font-size:9.5px;color:var(--ink-dim);line-height:1.5;margin-top:14px;max-width:90%">Los sistemas, procesos y operaciones para escalar tu marca de e-commerce a +100M por mes. Estable, escalable y largoplacista.</div>
+<div style="margin-top:16px;display:grid;gap:5px">
+<div class="mrow" style="border:none;padding:2px 0"><span class="mn">01</span><span>Principios y jerarquía de apalancamiento</span></div>
+<div class="mrow" style="border:none;padding:2px 0"><span class="mn">02</span><span>Producto, validación e investigación</span></div>
+<div class="mrow" style="border:none;padding:2px 0"><span class="mn">03</span><span>Costeo real, márgenes y oferta</span></div>
+<div class="mrow" style="border:none;padding:2px 0"><span class="mn">04</span><span>Marca, tienda y funnel</span></div>
+<div class="mrow" style="border:none;padding:2px 0"><span class="mn">05</span><span>Creativos, ads y escalado</span></div>
+<div class="mrow" style="border:none;padding:2px 0"><span class="mn">06</span><span>Retención, LTV y multicanal</span></div>
+<div class="mrow" style="border:none;padding:2px 0"><span class="mn">07</span><span>Operación, finanzas y equipo</span></div></div>
+<div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between">
+<span style="font-family:var(--mono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)">Manu Domínguez</span>
+<span style="font-family:var(--mono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-deep)">E-commerce AR</span></div></div>`;
+
+const P_COSTEO=`<div class="pgin"><div class="pgtop"><span class="l">Parte 03</span><span class="r">pág. 14</span></div>
+<div class="pgh">El costeo real,<br><span class="hl">línea por línea</span></div>
+<div class="pgsub">Qué te queda de verdad de una venta de $70.000.</div>
+<table class="mtbl"><tr><th>Concepto</th><th style="text-align:right">Monto</th></tr>
+<tr><td>Precio de venta</td><td class="v">$70.000</td></tr>
+<tr><td>Cuotas + pasarela</td><td class="v">— $9.800</td></tr>
+<tr><td>Ingresos Brutos</td><td class="v">— $2.800</td></tr>
+<tr><td>Producto</td><td class="v">— $10.000</td></tr>
+<tr><td>Envío + logística</td><td class="v">— $8.000</td></tr>
+<tr><td>Margen bruto</td><td class="v">$37.500</td></tr></table>
+<div class="mbox" style="margin-top:10px"><span class="k">Tu CPA break-even</span>Si pagás más de <b>$37.500</b> por cliente perdés plata — aunque Meta muestre ROAS positivo.</div>
+<div class="pgfoot"><span>Genesis <b>OS</b></span><span>Playbook Operativo</span></div></div>`;
+
+const P_FUNNEL=`<div class="pgin"><div class="pgtop"><span class="l">Parte 05</span><span class="r">pág. 24</span></div>
+<div class="pgh">El funnel que <span class="hl">convierte</span></div>
+<div class="pgsub">Dónde se pierden el 30-50% de las ventas.</div>
+<div class="mflow"><div class="s"><span class="t">TOF</span>Ad</div><div class="a">›</div>
+<div class="s"><span class="t">MOF</span>Pre-sell</div><div class="a">›</div>
+<div class="s"><span class="t">BOF</span>Sales</div><div class="a">›</div>
+<div class="s"><span class="t">AOV</span>Upsell</div></div>
+<div class="mbox" style="margin-bottom:8px"><span class="k">Regla crítica</span>Una landing <b>por ángulo</b>. Si tenés 4 ángulos, necesitás 4 landings.</div>
+<div class="mbox" style="margin-bottom:8px"><span class="k">Síntoma típico</span>CTR alto y conversión baja = incongruencia ad → landing.</div>
+<div class="mbox"><span class="k">Las FAQ</span>No son informativas: son <b>objeciones disfrazadas</b>.</div>
+<div class="pgfoot"><span>Genesis <b>OS</b></span><span>Playbook Operativo</span></div></div>`;
+
+const P_TESTEO=`<div class="pgin"><div class="pgtop"><span class="l">Parte 06</span><span class="r">pág. 31</span></div>
+<div class="pgh">Testeo con<br><span class="hl">sistema de purga</span></div>
+<div class="pgsub">5 conjuntos = 5 conceptos. 6 anuncios cada uno.</div>
+<div class="mgrid5"><div class="c"><div class="n">CJ01</div><div class="d">6 ads</div></div>
+<div class="c"><div class="n">CJ02</div><div class="d">6 ads</div></div>
+<div class="c"><div class="n">CJ03</div><div class="d">6 ads</div></div>
+<div class="c"><div class="n">CJ04</div><div class="d">6 ads</div></div>
+<div class="c"><div class="n">CJ05</div><div class="d">6 ads</div></div></div>
+<table class="mtbl"><tr><th>Variable</th><th style="text-align:right">Valor</th></tr>
+<tr><td>Por conjunto</td><td class="v">$30</td></tr>
+<tr><td>Testeo completo</td><td class="v">$150</td></tr>
+<tr><td>Segmentación</td><td class="v">Broad</td></tr>
+<tr><td>Intereses</td><td class="v">Cero</td></tr></table>
+<div class="mbox" style="margin-top:10px"><span class="k">Por qué ABO</span>Con CBO no sacás data de los otros conceptos rentables.</div>
+<div class="pgfoot"><span>Genesis <b>OS</b></span><span>Playbook Operativo</span></div></div>`;
+
+const P_RENOV=`<div class="pgin"><div class="pgtop"><span class="l">Parte 06</span><span class="r">pág. 38</span></div>
+<div class="pgh">La cuenta de<br><span class="hl">renovación</span></div>
+<div class="pgsub">Cuántos creativos necesitás no se decide a ojo.</div>
+<div class="mbox" style="margin-bottom:7px"><span class="k">Cálculo 1</span>Winners = <b>spend ÷ spend útil por winner</b></div>
+<div class="mbox" style="margin-bottom:10px"><span class="k">Cálculo 2</span>Anuncios = <b>winners ÷ hit rate</b></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+<div class="mbox mstat" style="padding:8px 0;text-align:center"><div class="v" style="font-size:22px">5</div><div class="k">Winners</div></div>
+<div class="mbox mstat" style="padding:8px 0;text-align:center"><div class="v" style="font-size:22px">50</div><div class="k">Anuncios</div></div></div>
+<div class="mbox" style="margin-top:10px"><span class="k">Ojo</span>Todo anuncio tiene <b>fecha de muerte por spend</b>.</div>
+<div class="pgfoot"><span>Genesis <b>OS</b></span><span>Playbook Operativo</span></div></div>`;
+
+const P_CASH=`<div class="pgin"><div class="pgtop"><span class="l">Parte 08</span><span class="r">pág. 45</span></div>
+<div class="pgh">Cash flow:<br><span class="hl">el oxígeno</span></div>
+<div class="pgsub">Se puede facturar récord y fundirse.</div>
+<div class="mrow"><span class="mn">1</span><span><b>Payment terms</b> con proveedores</span></div>
+<div class="mrow"><span class="mn">2</span><span>Líneas de crédito</span></div>
+<div class="mrow"><span class="mn">3</span><span>Acreditación según tu caja</span></div>
+<div class="mrow"><span class="mn">4</span><span>Coordinar cobro y entrega</span></div>
+<div class="mrow"><span class="mn">5</span><span>Proyección de stock a 90 días</span></div>
+<div class="mbox" style="margin-top:11px"><span class="k">La regla de oro</span>No retires plata hasta que el negocio <b>pagó su próxima vuelta</b>.</div>
+<div class="pgfoot"><span>Genesis <b>OS</b></span><span>Playbook Operativo</span></div></div>`;
+
+(function(){
+  const st=document.getElementById('stack'); if(!st) return;
+  const PW=282,PH=381;
+  const W=st.clientWidth,H=st.clientHeight,cx=W/2,cy=H/2;
+  const K=Math.min(W/820,H/430)*1.02;
+  function place(html,x,y,r,s,o,extra){
+    const d=document.createElement('div');
+    d.className='pg'+(extra||'');
+    d.style.width=PW+'px';d.style.height=PH+'px';
+    d.style.left=(cx+x*K-PW/2)+'px';
+    d.style.top=(cy+y*K-PH/2)+'px';
+    d.style.transform='rotate('+r+'deg) scale('+(K*s)+')';
+    d.style.transformOrigin='center center';
+    d.style.opacity=o;d.innerHTML=html;st.appendChild(d);
+  }
+  place(P_CASH,-300,34,-13,.90,.58);
+  place(P_TESTEO,300,34,13,.90,.58);
+  place(P_FUNNEL,-165,12,-7,.96,.80);
+  place(P_RENOV,165,12,7,.96,.80);
+  place(P_COSTEO,0,4,0,.97,.92);
+  place(COVER,0,-20,0,1.04,1,' front');
+  const bs=Math.max(94,138*K);
+  const b=document.createElement('div');
+  b.className='pagebadge';
+  b.style.width=bs+'px';b.style.height=bs+'px';
+  b.style.left=(cx+250*K-bs/2)+'px';
+  b.style.top=(cy-140*K-bs/2)+'px';
+  b.innerHTML='<span class="n" style="font-size:'+Math.round(bs*.40)+'px">50</span><span class="l" style="font-size:'+Math.round(bs*.10)+'px">páginas</span>';
+  st.appendChild(b);
+})();
+
+(function(){
+  const grid=document.getElementById('tocgrid');
+  document.querySelectorAll('.part,.sec').forEach(el=>{
+    if(el.classList.contains('part')){
+      const h=document.createElement('div');
+      h.className='h';h.textContent=el.dataset.part||'';
+      grid.appendChild(h);
+    }else{
+      const a=document.createElement('a');
+      a.href='#'+el.id;
+      a.innerHTML='<span>'+el.querySelector('.secno').textContent+'</span><span>'+(el.dataset.t||'')+'</span>';
+      a.addEventListener('click',()=>document.getElementById('tocpanel').classList.remove('on'));
+      grid.appendChild(a);
+    }
+  });
+})();
+window.toc=function(){document.getElementById('tocpanel').classList.toggle('on');};
+
+const pbar=document.getElementById('pbar'),topbar=document.getElementById('topbar');
+function onScroll(){
+  const h=document.documentElement;
+  const p=h.scrollTop/((h.scrollHeight-h.clientHeight)||1);
+  pbar.style.width=(p*100)+'%';
+  topbar.classList.toggle('on',h.scrollTop>window.innerHeight*.72);
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+window.addEventListener('resize',onScroll);
+onScroll();
+
+let capState=0;
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key==='c'||e.key==='C'){
+    capState=(capState+1)%3;
+    document.body.classList.toggle('cap',capState>0);
+    document.body.classList.toggle('c916',capState===2);
+  }
+  if(e.key==='Escape'){
+    capState=0;document.body.classList.remove('cap','c916');
+    document.getElementById('tocpanel').classList.remove('on');
+  }
+});
+</script>
+</body>
+</html>
